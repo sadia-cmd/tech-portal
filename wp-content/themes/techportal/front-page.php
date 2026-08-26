@@ -2,9 +2,9 @@
 /**
  * Front Page Template — Tech Portal Homepage
  *
- * 18 sections: Utility header, Masthead, Category nav, Breaking ticker,
- * Hero story, Top stories, Latest feed, Trending, Startups, Web Channel,
- * Episodes, AI & Cloud, Cybersecurity, Sponsors, Newsletter, Footer.
+ * Editorial hierarchy: Breaking → Hero → Top Stories → Editor's Picks →
+ * Latest News → Trending → Startups → Web Channel → AI & Cloud →
+ * Cybersecurity → Sponsors → Newsletter → Footer
  *
  * @package TechPortal
  */
@@ -13,15 +13,22 @@ get_header();
 ?>
 
 <?php
-// ---- Queries ----
-$hero_args = array(
+// ---- Editorial Queries using new functions ----
+$hero = tp_get_hero_story();
+$featured = tp_get_featured_posts( 4 );
+$breaking = tp_get_breaking_posts( 5 );
+$trending = tp_get_trending_posts( 8 );
+
+$latest_args = array(
     'post_type'      => array( 'post', 'portal_article' ),
     'post_status'    => 'publish',
-    'posts_per_page' => 1,
+    'posts_per_page' => 12,
     'orderby'        => 'date',
     'order'          => 'DESC',
 );
-$hero_query = new WP_Query( $hero_args );
+$latest_query = new WP_Query( $latest_args );
+
+$hero_id = $hero ? $hero->ID : 0;
 
 $top_args = array(
     'post_type'      => array( 'post', 'portal_article' ),
@@ -29,28 +36,9 @@ $top_args = array(
     'posts_per_page' => 5,
     'orderby'        => 'date',
     'order'          => 'DESC',
-    'post__not_in'   => $hero_query->posts ? array( $hero_query->posts[0]->ID ) : array(),
+    'post__not_in'   => $hero_id ? array( $hero_id ) : array(),
 );
 $top_query = new WP_Query( $top_args );
-
-$latest_args = array(
-    'post_type'      => array( 'post', 'portal_article' ),
-    'post_status'    => 'publish',
-    'posts_per_page' => 15,
-    'orderby'        => 'date',
-    'order'          => 'DESC',
-);
-$latest_query = new WP_Query( $latest_args );
-
-$trending_args = array(
-    'post_type'      => array( 'post', 'portal_article' ),
-    'post_status'    => 'publish',
-    'posts_per_page' => 8,
-    'orderby'        => 'comment_count',
-    'order'          => 'DESC',
-    'date_query'     => array( array( 'after' => '14 days ago' ) ),
-);
-$trending_query = new WP_Query( $trending_args );
 
 $startup_args = array(
     'post_type'      => 'portal_startup',
@@ -95,15 +83,44 @@ $cyber_args = array(
     'order'          => 'DESC',
 );
 $cyber_query = new WP_Query( $cyber_args );
+
+// Sponsors
+$sponsors = tp_get_active_sponsors();
 ?>
 
-<!-- ============================================
-     SECTION 7: Major Hero Story
-     ============================================ -->
-<?php if ( $hero_query->have_posts() ) : $hero = $hero_query->posts[0]; ?>
+<?php
+// ============================================
+// BREAKING NEWS TICKER
+// ============================================
+if ( ! empty( $breaking ) ) :
+?>
+<section class="tp-ticker">
+    <div class="tp-ticker__inner tp-container">
+        <div class="tp-ticker__label">Breaking</div>
+        <div class="tp-ticker__content">
+            <div class="tp-ticker__scroll">
+                <?php foreach ( $breaking as $bp ) : ?>
+                    <a href="<?php echo esc_url( get_permalink( $bp->ID ) ); ?>" class="tp-ticker__item">
+                        <?php echo esc_html( $bp->post_title ); ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+
+<?php
+// ============================================
+// HERO STORY + TOP STORIES
+// ============================================
+if ( $hero ) :
+?>
 <section class="tp-hero-section" style="background:var(--tp-ink);padding:var(--tp-space-6) 0;">
     <div class="tp-container">
         <div class="tp-grid">
+            <!-- Hero: Major Story (8 cols) -->
             <div class="tp-col-8" style="position:relative;border-radius:var(--tp-radius-lg);overflow:hidden;">
                 <?php if ( has_post_thumbnail( $hero->ID ) ) : ?>
                     <a href="<?php echo esc_url( get_permalink( $hero->ID ) ); ?>" style="display:block;">
@@ -138,7 +155,7 @@ $cyber_query = new WP_Query( $cyber_args );
                 </div>
             </div>
 
-            <!-- Side: Top Stories -->
+            <!-- Side: Top Stories (4 cols) -->
             <div class="tp-col-4" style="display:flex;flex-direction:column;gap:var(--tp-space-3);">
                 <div style="font-size:var(--tp-text-xs);font-weight:var(--tp-weight-bold);text-transform:uppercase;letter-spacing:0.08em;color:var(--tp-accent);padding-bottom:var(--tp-space-2);border-bottom:1px solid rgba(255,255,255,0.15);margin-bottom:var(--tp-space-1);">
                     Top Stories
@@ -175,9 +192,12 @@ $cyber_query = new WP_Query( $cyber_args );
 <?php endif; ?>
 
 
-<!-- ============================================
-     SECTION 8: Curated Top Stories Grid
-     ============================================ -->
+<?php
+// ============================================
+// EDITOR'S PICKS / CURATED
+// ============================================
+if ( ! empty( $featured ) ) :
+?>
 <section style="padding:var(--tp-space-10) 0;">
     <div class="tp-container">
         <div class="tp-section-header">
@@ -186,42 +206,41 @@ $cyber_query = new WP_Query( $cyber_args );
         </div>
         <div class="tp-grid">
             <?php
-            if ( $top_query->have_posts() ) :
-                $grid_count = 0;
-                while ( $top_query->have_posts() ) : $top_query->the_post();
-                    $grid_count++;
-                    $card_class = $grid_count <= 2 ? 'tp-card--feature' : 'tp-card--standard';
+            $grid_count = 0;
+            foreach ( $featured as $fp ) :
+                setup_postdata( $fp );
+                $grid_count++;
+                $card_class = $grid_count <= 2 ? 'tp-card--feature' : 'tp-card--standard';
             ?>
             <article class="tp-card <?php echo esc_attr( $card_class ); ?>">
-                <?php if ( has_post_thumbnail() ) : ?>
+                <?php if ( has_post_thumbnail( $fp->ID ) ) : ?>
                     <div class="tp-card__image">
-                        <a href="<?php the_permalink(); ?>">
-                            <?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
+                        <a href="<?php echo esc_url( get_permalink( $fp->ID ) ); ?>">
+                            <?php echo get_the_post_thumbnail( $fp->ID, 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
                         </a>
                     </div>
                 <?php endif; ?>
                 <div class="tp-card__body">
-                    <div class="tp-card__category"><?php techportal_category_label(); ?></div>
+                    <div class="tp-card__category"><?php techportal_category_label( $fp->ID ); ?></div>
                     <h3 class="tp-card__title">
-                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                        <a href="<?php echo esc_url( get_permalink( $fp->ID ) ); ?>"><?php echo esc_html( $fp->post_title ); ?></a>
                     </h3>
-                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 18 ) ); ?></p>
-                    <?php techportal_post_meta(); ?>
+                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( $fp->post_content, 18 ) ); ?></p>
+                    <?php techportal_post_meta( $fp->ID ); ?>
                 </div>
             </article>
-            <?php
-                endwhile;
-                wp_reset_postdata();
-            endif;
-            ?>
+            <?php endforeach; wp_reset_postdata(); ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 
-<!-- ============================================
-     SECTION 9: Latest News Feed + Section 10: Trending
-     ============================================ -->
+<?php
+// ============================================
+// LATEST NEWS + TRENDING
+// ============================================
+?>
 <section style="padding:var(--tp-space-8) 0;background:var(--tp-bg-secondary);">
     <div class="tp-container">
         <div class="tp-grid">
@@ -263,19 +282,20 @@ $cyber_query = new WP_Query( $cyber_args );
                     <h2 class="tp-section-header__title">Trending</h2>
                 </div>
                 <?php
-                if ( $trending_query->have_posts() ) :
+                if ( ! empty( $trending ) ) :
                     $rank = 1;
-                    while ( $trending_query->have_posts() ) : $trending_query->the_post();
+                    foreach ( $trending as $tp ) :
+                        setup_postdata( $tp );
                 ?>
                 <div class="tp-trending-item">
                     <span class="tp-trending-item__rank"><?php echo esc_html( str_pad( $rank, 2, '0', STR_PAD_LEFT ) ); ?></span>
                     <div>
-                        <a href="<?php the_permalink(); ?>" class="tp-latest-item__title" style="display:block;">
-                            <?php the_title(); ?>
+                        <a href="<?php echo esc_url( get_permalink( $tp->ID ) ); ?>" class="tp-latest-item__title" style="display:block;">
+                            <?php echo esc_html( $tp->post_title ); ?>
                         </a>
                         <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);margin-top:2px;">
                             <?php
-                            $cats = get_the_category( get_the_ID() );
+                            $cats = get_the_category( $tp->ID );
                             echo esc_html( $cats[0]->name ?? '' );
                             ?>
                         </div>
@@ -283,7 +303,7 @@ $cyber_query = new WP_Query( $cyber_args );
                 </div>
                 <?php
                         $rank++;
-                    endwhile;
+                    endforeach;
                     wp_reset_postdata();
                 endif;
                 ?>
@@ -293,10 +313,12 @@ $cyber_query = new WP_Query( $cyber_args );
 </section>
 
 
-<!-- ============================================
-     SECTION 11: Startup Ecosystem Showcase
-     ============================================ -->
-<?php if ( $startup_query->have_posts() ) : ?>
+<?php
+// ============================================
+// STARTUP ECOSYSTEM
+// ============================================
+if ( $startup_query->have_posts() ) :
+?>
 <section style="padding:var(--tp-space-10) 0;">
     <div class="tp-container">
         <div class="tp-section-header">
@@ -308,6 +330,7 @@ $cyber_query = new WP_Query( $cyber_args );
             while ( $startup_query->have_posts() ) : $startup_query->the_post();
                 $stages = get_the_terms( get_the_ID(), 'startup_stage' );
                 $stage_name = $stages ? $stages[0]->name : '';
+                $meta = tp_get_startup_meta( get_the_ID() );
             ?>
             <article class="tp-card tp-card--standard">
                 <?php if ( has_post_thumbnail() ) : ?>
@@ -329,6 +352,11 @@ $cyber_query = new WP_Query( $cyber_args );
                         <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                     </h3>
                     <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
+                    <?php if ( ! empty( $meta['location'] ) ) : ?>
+                        <div style="font-size:var(--tp-text-xs);color:var(--tp-text-secondary);margin-top:auto;padding-top:var(--tp-space-2);">
+                            📍 <?php echo esc_html( $meta['location'] ); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </article>
             <?php endwhile; wp_reset_postdata(); ?>
@@ -338,17 +366,19 @@ $cyber_query = new WP_Query( $cyber_args );
 <?php endif; ?>
 
 
-<!-- ============================================
-     SECTION 12 & 13: Web Channel / Episodes
-     ============================================ -->
+<?php
+// ============================================
+// WEB CHANNEL / EPISODES
+// ============================================
+?>
 <section style="padding:var(--tp-space-10) 0;background:var(--tp-ink);color:#fff;">
     <div class="tp-container">
         <div class="tp-section-header" style="border-bottom-color:rgba(255,255,255,0.15);">
             <h2 class="tp-section-header__title" style="color:#fff;">📺 Web Channel</h2>
-            <a href="<?php echo esc_url( home_url( '/episode/' ) ); ?>" class="tp-section-header__link">All Episodes →</a>
+            <a href="<?php echo esc_url( home_url( '/web-channel/' ) ); ?>" class="tp-section-header__link">Visit Web Channel →</a>
         </div>
 
-        <!-- Live Indicator Placeholder -->
+        <!-- TechTalk Live Promo -->
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--tp-radius-lg);padding:var(--tp-space-6);margin-bottom:var(--tp-space-8);display:flex;align-items:center;gap:var(--tp-space-6);">
             <div style="position:relative;width:100%;max-width:560px;aspect-ratio:16/9;background:#000;border-radius:var(--tp-radius-md);overflow:hidden;display:flex;align-items:center;justify-content:center;">
                 <div style="color:rgba(255,255,255,0.3);font-size:var(--tp-text-lg);">Live Stream Area</div>
@@ -362,9 +392,7 @@ $cyber_query = new WP_Query( $cyber_args );
                 <p style="color:rgba(255,255,255,0.7);font-size:var(--tp-text-sm);margin-bottom:var(--tp-space-3);line-height:1.6;">
                     Join us every Friday at 8 PM PKT for live discussions on Pakistan's tech ecosystem, startup funding, and emerging technologies.
                 </p>
-                <div style="display:flex;gap:var(--tp-space-3);flex-wrap:wrap;">
-                    <span style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.5);">Every Friday • 8:00 PM PKT</span>
-                </div>
+                <span style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.5);">Every Friday • 8:00 PM PKT</span>
             </div>
         </div>
 
@@ -373,6 +401,7 @@ $cyber_query = new WP_Query( $cyber_args );
         <div class="tp-grid">
             <?php
             while ( $episode_query->have_posts() ) : $episode_query->the_post();
+                $ep_meta = tp_get_episode_meta( get_the_ID() );
             ?>
             <article class="tp-card tp-card--standard" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
                 <?php if ( has_post_thumbnail() ) : ?>
@@ -387,9 +416,19 @@ $cyber_query = new WP_Query( $cyber_args );
                     </div>
                 <?php endif; ?>
                 <div class="tp-card__body">
+                    <?php if ( ! empty( $ep_meta['show_name'] ) ) : ?>
+                        <div style="font-size:var(--tp-text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tp-accent);margin-bottom:var(--tp-space-1);">
+                            <?php echo esc_html( $ep_meta['show_name'] ); ?>
+                        </div>
+                    <?php endif; ?>
                     <h3 class="tp-card__title" style="color:#fff;">
                         <a href="<?php the_permalink(); ?>" style="color:#fff;"><?php the_title(); ?></a>
                     </h3>
+                    <?php if ( ! empty( $ep_meta['guest_name'] ) ) : ?>
+                        <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.6);margin-bottom:var(--tp-space-2);">
+                            Guest: <?php echo esc_html( $ep_meta['guest_name'] ); ?>
+                        </div>
+                    <?php endif; ?>
                     <p class="tp-card__excerpt" style="color:rgba(255,255,255,0.6);"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
                     <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:auto;">
                         <?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
@@ -403,9 +442,11 @@ $cyber_query = new WP_Query( $cyber_args );
 </section>
 
 
-<!-- ============================================
-     SECTION 14: AI & Cloud + SECTION 15: Cybersecurity
-     ============================================ -->
+<?php
+// ============================================
+// AI & CLOUD + CYBERSECURITY
+// ============================================
+?>
 <section style="padding:var(--tp-space-10) 0;">
     <div class="tp-container">
         <div class="tp-grid">
@@ -413,7 +454,7 @@ $cyber_query = new WP_Query( $cyber_args );
             <div class="tp-col-6">
                 <div class="tp-section-header">
                     <h2 class="tp-section-header__title">🤖 AI & Cloud</h2>
-                    <a href="<?php echo esc_url( home_url( '/topic/ai/' ) ); ?>" class="tp-section-header__link">More →</a>
+                    <a href="<?php echo esc_url( home_url( '/category/ai-cloud/' ) ); ?>" class="tp-section-header__link">More →</a>
                 </div>
                 <?php
                 if ( $ai_query->have_posts() ) :
@@ -495,55 +536,57 @@ $cyber_query = new WP_Query( $cyber_args );
 </section>
 
 
-<!-- ============================================
-     SECTION 16: Sponsor Inventory
-     ============================================ -->
-<section style="padding:var(--tp-space-8) 0;border-top:1px solid var(--tp-border);border-bottom:1px solid var(--tp-border);">
+<?php
+// ============================================
+// SPONSORS (only show if sponsors exist)
+// ============================================
+if ( ! empty( $ponsors ) ) :
+?>
+<section style="padding:var(--tp-space-8) 0;border-top:1px solid var(--tp-border);">
     <div class="tp-container">
         <div style="text-align:center;margin-bottom:var(--tp-space-4);">
-            <span style="font-size:var(--tp-text-xs);text-transform:uppercase;letter-spacing:0.1em;color:var(--tp-muted);font-weight:600;">Sponsored</span>
+            <span style="font-size:var(--tp-text-xs);text-transform:uppercase;letter-spacing:0.1em;color:var(--tp-text-secondary);font-weight:var(--tp-weight-semibold);">Sponsored</span>
         </div>
-        <div class="tp-grid" style="align-items:center;">
-            <div class="tp-col-4">
+        <div class="tp-grid" style="justify-items:center;">
+            <?php foreach ( $ponsors as $sponsor ) : ?>
                 <div class="tp-sponsor-slot">
-                    <span class="tp-sponsor-slot__label">Sponsor Slot 1</span>
+                    <?php if ( $sponsor['image'] ) : ?>
+                        <a href="<?php echo esc_url( $sponsor['url'] ); ?>" target="_blank" rel="noopener">
+                            <img src="<?php echo esc_url( $sponsor['image'] ); ?>" alt="<?php echo esc_attr( $sponsor['label'] ); ?>" style="max-height:60px;">
+                        </a>
+                    <?php else : ?>
+                        <span class="tp-sponsor-slot__label"><?php echo esc_html( $sponsor['label'] ); ?></span>
+                    <?php endif; ?>
                 </div>
-            </div>
-            <div class="tp-col-4">
-                <div class="tp-sponsor-slot">
-                    <span class="tp-sponsor-slot__label">Sponsor Slot 2</span>
-                </div>
-            </div>
-            <div class="tp-col-4">
-                <div class="tp-sponsor-slot">
-                    <span class="tp-sponsor-slot__label">Sponsor Slot 3</span>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 
-<!-- ============================================
-     SECTION 17: Newsletter CTA
-     ============================================ -->
+<?php
+// ============================================
+// NEWSLETTER CTA
+// ============================================
+?>
 <section style="padding:var(--tp-space-10) 0;">
     <div class="tp-container">
         <div class="tp-newsletter">
             <h2 class="tp-newsletter__title">Stay Ahead in Tech</h2>
-            <p class="tp-newsletter__desc">
-                Get Pakistan's top technology news, startup insights, and industry analysis delivered to your inbox every morning.
-            </p>
-            <form class="tp-newsletter__form" action="#" method="post">
+            <p class="tp-newsletter__desc">Get Pakistan's top technology news, startup insights, and industry analysis delivered to your inbox every morning.</p>
+            <form class="tp-newsletter__form" data-newsletter="main">
                 <input type="email" class="tp-newsletter__input" placeholder="your@email.com" required aria-label="Email address">
                 <button type="submit" class="tp-newsletter__btn">Subscribe</button>
             </form>
-            <p style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:var(--tp-space-3);">
-                No spam. Unsubscribe anytime. Join 15,000+ tech professionals.
-            </p>
+            <p style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:var(--tp-space-3);">No spam. Unsubscribe anytime.</p>
         </div>
     </div>
 </section>
 
 
-<?php get_footer(); ?>
+<?php
+// Clean up queries
+wp_reset_postdata();
+
+get_footer();

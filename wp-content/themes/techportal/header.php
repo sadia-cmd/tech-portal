@@ -12,7 +12,7 @@
 
 <a class="screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'techportal' ); ?></a>
 
-<!-- Utility Header -->
+<!-- Utility Bar -->
 <div class="tp-header__utility">
     <div class="tp-container">
         <div>
@@ -46,8 +46,9 @@ if ( ! empty( $breaking ) ) : ?>
 </div>
 <?php endif; ?>
 
-<!-- Main Header -->
+<!-- Header -->
 <header class="tp-header" role="banner">
+    <!-- Masthead -->
     <div class="tp-header__masthead">
         <div class="tp-container">
             <?php if ( has_custom_logo() ) : ?>
@@ -61,17 +62,20 @@ if ( ! empty( $breaking ) ) : ?>
             <?php endif; ?>
 
             <div class="tp-header__actions">
-                <button class="tp-btn tp-btn--outline tp-hide-mobile" aria-label="Search">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="tp-btn tp-btn--outline tp-hide-mobile" aria-label="<?php esc_attr_e( 'Search', 'techportal' ); ?>">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                     </svg>
-                    Search
+                    <?php esc_html_e( 'Search', 'techportal' ); ?>
                 </button>
-                <a href="<?php echo esc_url( wp_login_url() ); ?>" class="tp-btn tp-btn--primary tp-hide-mobile">
-                    Sign In
+                <a href="<?php echo esc_url( home_url( '/newsletter/' ) ); ?>" class="tp-btn tp-btn--outline tp-hide-mobile" aria-label="<?php esc_attr_e( 'Newsletter', 'techportal' ); ?>">
+                    <?php esc_html_e( 'Newsletter', 'techportal' ); ?>
                 </a>
-                <button class="tp-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <a href="<?php echo esc_url( wp_login_url() ); ?>" class="tp-btn tp-btn--primary tp-hide-mobile">
+                    <?php esc_html_e( 'Sign In', 'techportal' ); ?>
+                </a>
+                <button class="tp-nav-toggle" aria-label="<?php esc_attr_e( 'Toggle navigation', 'techportal' ); ?>" aria-expanded="false" aria-controls="tp-mobile-nav">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M3 12h18M3 6h18M3 18h18"/>
                     </svg>
                 </button>
@@ -79,7 +83,7 @@ if ( ! empty( $breaking ) ) : ?>
         </div>
     </div>
 
-    <!-- Category Navigation -->
+    <!-- Primary Navigation -->
     <nav class="tp-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary Navigation', 'techportal' ); ?>">
         <div class="tp-container">
             <?php
@@ -91,29 +95,57 @@ if ( ! empty( $breaking ) ) : ?>
                 'depth'          => 2,
             ) );
             ?>
+            <div class="tp-nav__actions">
+                <a href="<?php echo esc_url( home_url( '/submit-news/' ) ); ?>" class="tp-nav__link">
+                    <?php esc_html_e( 'Submit News', 'techportal' ); ?>
+                </a>
+                <a href="<?php echo esc_url( home_url( '/advertise/' ) ); ?>" class="tp-nav__link">
+                    <?php esc_html_e( 'Advertise', 'techportal' ); ?>
+                </a>
+            </div>
         </div>
     </nav>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="tp-nav__mobile-overlay" id="tp-mobile-nav" aria-hidden="true" role="dialog" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'techportal' ); ?>">
+        <div class="tp-nav__mobile-inner">
+            <button class="tp-nav__mobile-close" aria-label="<?php esc_attr_e( 'Close menu', 'techportal' ); ?>">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="tp-nav__mobile-search">
+                <button class="tp-btn tp-btn--outline" aria-label="<?php esc_attr_e( 'Search', 'techportal' ); ?>">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <?php esc_html_e( 'Search', 'techportal' ); ?>
+                </button>
+            </div>
+
+            <nav aria-label="<?php esc_attr_e( 'Mobile Navigation', 'techportal' ); ?>">
+                <?php
+                wp_nav_menu( array(
+                    'theme_location' => 'primary',
+                    'container'      => false,
+                    'menu_class'     => 'tp-nav__mobile-list',
+                    'fallback_cb'    => false,
+                    'depth'          => 2,
+                ) );
+                ?>
+            </nav>
+
+            <div class="tp-nav__mobile-actions">
+                <a href="<?php echo esc_url( home_url( '/newsletter/' ) ); ?>" class="tp-btn tp-btn--outline tp-btn--full">
+                    <?php esc_html_e( 'Newsletter', 'techportal' ); ?>
+                </a>
+                <a href="<?php echo esc_url( wp_login_url() ); ?>" class="tp-btn tp-btn--primary tp-btn--full">
+                    <?php esc_html_e( 'Sign In', 'techportal' ); ?>
+                </a>
+            </div>
+        </div>
+    </div>
 </header>
 
 <main id="content" role="main">
-<?php
-
-/**
- * Fallback menu if no menu is assigned
- */
-function techportal_fallback_menu() {
-    echo '<ul class="tp-nav__list">';
-    $categories = get_categories( array(
-        'number'  => 8,
-        'orderby' => 'count',
-        'order'   => 'DESC',
-    ) );
-    foreach ( $categories as $cat ) {
-        printf(
-            '<li><a href="%s" class="tp-nav__link">%s</a></li>',
-            esc_url( get_category_link( $cat->term_id ) ),
-            esc_html( $cat->name )
-        );
-    }
-    echo '</ul>';
-}

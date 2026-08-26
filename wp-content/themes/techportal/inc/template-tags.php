@@ -53,6 +53,9 @@ function techportal_post_meta( $post_id = null ) {
 
 /**
  * Print the post meta for articles (inline format)
+ *
+ * Correct pattern: By AUTHOR NAME | Published DATE | Updated DATE | READ TIME
+ * Does NOT render "By" without an author name.
  */
 function techportal_article_meta( $post_id = null ) {
     if ( ! $post_id ) $post_id = get_the_ID();
@@ -62,16 +65,19 @@ function techportal_article_meta( $post_id = null ) {
     $word_count = str_word_count( strip_tags( $content ) );
     $minutes    = max( 1, ceil( $word_count / 250 ) );
 
-    printf(
-        '<div class="tp-article__meta">
-            <span>By <strong>%s</strong></span>
-            <span>%s</span>
-            <span>%d min read</span>
-        </div>',
-        esc_html( $author ),
-        esc_html( $date ),
-        $minutes
-    );
+    $modified = get_the_modified_date( 'F j, Y', $post_id );
+    $show_updated = ( $modified !== $date );
+
+    echo '<div class="tp-article__meta">';
+    if ( ! empty( $author ) ) {
+        printf( '<span>By <strong>%s</strong></span>', esc_html( $author ) );
+    }
+    printf( '<span>Published %s</span>', esc_html( $date ) );
+    if ( $show_updated ) {
+        printf( '<span>Updated %s</span>', esc_html( $modified ) );
+    }
+    printf( '<span>%d min read</span>', $minutes );
+    echo '</div>';
 }
 
 /**
