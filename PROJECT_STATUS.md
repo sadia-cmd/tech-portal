@@ -226,3 +226,51 @@ VPS (Ubuntu 24.04, 2 cores, 5.8GB RAM)
 | Cron scheduled (every 45 min) | ✅ |
 | Admin page loads (`/wp-admin/admin.php?page=news-radar`) | ✅ |
 | API connection (needs email verification) | ⚠️ Pending |
+
+---
+
+## Phase 3A.1 — Dual-Source News Fetcher ✅
+
+**Last Updated:** 2026-08-26
+
+### What Was Built
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| NewsAPI.org secondary source | ✅ | Falls back when GNews fails or returns 0 articles |
+| `api_source` column | ✅ | Tracks `gnews` vs `newsapi` per story |
+| Dual test buttons | ✅ | "Test GNews" + "Test NewsAPI" in admin UI |
+| Source summary bar | ✅ | Shows per-source story counts with color badges |
+| Source filter dropdown | ✅ | Filter stories by GNews or NewsAPI |
+| API column in table | ✅ | Blue badge for GNEWS, orange for NEWSAPI |
+| Per-source fetch counts | ✅ | Shows GNews/NewsAPI split in fetch results |
+| User-Agent header | ✅ | Added `TechPortal NewsRadar/2.0` for NewsAPI compliance |
+
+### How It Works
+
+1. **Primary:** GNews API (6 topics, Pakistan-focused)
+2. **Fallback:** NewsAPI.org (6 topics, broader English coverage)
+3. If GNews returns an error or 0 articles for a topic → NewsAPI picks it up
+4. Each story tagged with `api_source` for filtering and display
+5. Dedup works across both sources (URL + title hash)
+
+### Fetch Results (2026-08-26)
+
+| Metric | Value |
+|--------|-------|
+| Total stories | 70 |
+| GNews stories | 30 |
+| NewsAPI stories | 40 |
+| Cron | Active, every 45 min |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `includes/class-portal-news-radar-db.php` | Added `api_source` column, `count_by_source()`, source filter |
+| `includes/class-portal-news-radar-fetcher.php` | Full rewrite — dual-source with GNews primary + NewsAPI fallback |
+| `includes/class-portal-news-radar.php` | Load `NEWSAPI_KEY` from `.env` |
+| `includes/class-portal-news-radar-admin.php` | Dual test buttons, source summary, API column, source filter |
+| `assets/js/news-radar.js` | Dual test handlers, fetch result shows per-source counts |
+| `assets/css/news-radar.css` | Source summary badges, API column badges |
+| `.env` | Added `NEWSAPI_KEY` |

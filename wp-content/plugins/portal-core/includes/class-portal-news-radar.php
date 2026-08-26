@@ -31,10 +31,8 @@ class Portal_News_Radar {
         // Schedule cron if not already scheduled
         add_action( 'init', array( $this, 'schedule_cron' ) );
 
-        // Load GNEWS_API_KEY from .env if not already defined
-        if ( ! defined( 'GNEWS_API_KEY' ) || empty( GNEWS_API_KEY ) ) {
-            $this->load_env_key();
-        }
+        // Load API keys from .env if not already defined
+        $this->load_env_keys();
     }
 
     /** Create/upgrade the custom DB table */
@@ -72,11 +70,12 @@ class Portal_News_Radar {
         return $schedules;
     }
 
-    /** Load GNEWS_API_KEY from .env file */
-    private function load_env_key() {
+    /** Load API keys from .env file */
+    private function load_env_keys() {
         $env_file = dirname( dirname( __DIR__ ) ) . '/.env'; // plugin dir ../../ = WP root
         if ( ! file_exists( $env_file ) ) return;
 
+        $wanted_keys = array( 'GNEWS_API_KEY', 'NEWSAPI_KEY' );
         $lines = file( $env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
         foreach ( $lines as $line ) {
             if ( strpos( trim( $line ), '#' ) === 0 ) continue;
@@ -84,12 +83,11 @@ class Portal_News_Radar {
             list( $name, $value ) = explode( '=', $line, 2 );
             $name  = trim( $name );
             $value = trim( $value, " \t\n\r\0\x0B\"'" );
-            if ( $name === 'GNEWS_API_KEY' && ! empty( $value ) ) {
-                if ( ! defined( 'GNEWS_API_KEY' ) ) {
-                    define( 'GNEWS_API_KEY', $value );
+            if ( in_array( $name, $wanted_keys, true ) && ! empty( $value ) ) {
+                if ( ! defined( $name ) ) {
+                    define( $name, $value );
                 }
-                putenv( "GNEWS_API_KEY={$value}" );
-                break;
+                putenv( "{$name}={$value}" );
             }
         }
     }

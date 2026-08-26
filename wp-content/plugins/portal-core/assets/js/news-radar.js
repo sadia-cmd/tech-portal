@@ -1,10 +1,10 @@
 /**
  * News Radar — Admin JS (vanilla, no jQuery)
+ * Dual-source: GNews + NewsAPI.org
  */
 (function() {
     'use strict';
 
-    // Wait for DOM
     document.addEventListener('DOMContentLoaded', function() {
 
         function ajaxPost(action, data, callback) {
@@ -23,23 +23,45 @@
             xhr.send(fd);
         }
 
-        /* ─── Test API ─── */
-        var testBtn = document.getElementById('nr-test-api');
-        var fetchBtn = document.getElementById('nr-fetch-now');
         var resultEl = document.getElementById('nr-api-result');
 
-        if (testBtn) {
-            testBtn.addEventListener('click', function(e) {
+        /* ─── Test GNews ─── */
+        var testGnews = document.getElementById('nr-test-gnews');
+        if (testGnews) {
+            testGnews.addEventListener('click', function(e) {
                 e.preventDefault();
-                testBtn.disabled = true;
-                testBtn.textContent = '⏳ Testing…';
+                testGnews.disabled = true;
+                testGnews.textContent = '⏳ Testing…';
                 resultEl.textContent = '';
 
-                ajaxPost('newsradar_test_api', {}, function(err, res) {
-                    testBtn.disabled = false;
-                    testBtn.textContent = '🔌 Test API';
+                ajaxPost('newsradar_test_gnews', {}, function(err, res) {
+                    testGnews.disabled = false;
+                    testGnews.textContent = '🔌 Test GNews';
                     if (err || !res) {
-                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ Request failed.</span>';
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ GNews request failed.</span>';
+                    } else if (res.ok) {
+                        resultEl.innerHTML = '<span style="color:#46b450">✅ ' + res.message + '</span>';
+                    } else {
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ ' + res.message + '</span>';
+                    }
+                });
+            });
+        }
+
+        /* ─── Test NewsAPI ─── */
+        var testNewsapi = document.getElementById('nr-test-newsapi');
+        if (testNewsapi) {
+            testNewsapi.addEventListener('click', function(e) {
+                e.preventDefault();
+                testNewsapi.disabled = true;
+                testNewsapi.textContent = '⏳ Testing…';
+                resultEl.textContent = '';
+
+                ajaxPost('newsradar_test_newsapi', {}, function(err, res) {
+                    testNewsapi.disabled = false;
+                    testNewsapi.textContent = '🔌 Test NewsAPI';
+                    if (err || !res) {
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ NewsAPI request failed.</span>';
                     } else if (res.ok) {
                         resultEl.innerHTML = '<span style="color:#46b450">✅ ' + res.message + '</span>';
                     } else {
@@ -50,6 +72,7 @@
         }
 
         /* ─── Fetch Now ─── */
+        var fetchBtn = document.getElementById('nr-fetch-now');
         if (fetchBtn) {
             fetchBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -65,8 +88,9 @@
                     } else if (res.success) {
                         var d = res.data;
                         var msg = 'Fetched: ' + d.fetched + ' | New: ' + d.new + ' | Duplicates: ' + d.duplicates;
+                        msg += ' | GNews: ' + d.gnews_count + ' | NewsAPI: ' + d.newsapi_count;
                         if (d.errors && Object.keys(d.errors).length) {
-                            msg += ' | Errors: ' + JSON.stringify(d.errors);
+                            msg += ' | Errors: ' + Object.keys(d.errors).length + ' topics';
                         }
                         resultEl.innerHTML = '<span style="color:#46b450">✅ ' + msg + '</span>';
                         setTimeout(function() { location.reload(); }, 1500);
@@ -114,7 +138,6 @@
                             var badge = row.querySelector('.status-badge');
                             if (badge) { badge.className = 'status-badge status-drafted'; badge.textContent = 'drafted'; }
                         }
-                        // Update counts
                         var newCount = document.querySelector('.status-card.new .num');
                         var draftCount = document.querySelector('.status-card.drafted .num');
                         if (newCount) newCount.textContent = Math.max(0, parseInt(newCount.textContent) - 1);

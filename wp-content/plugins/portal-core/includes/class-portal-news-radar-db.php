@@ -40,6 +40,7 @@ class Portal_News_Radar_DB {
             published_at DATETIME DEFAULT NULL,
             topic VARCHAR(64) NOT NULL DEFAULT '',
             category_suggested VARCHAR(128) DEFAULT '',
+            api_source VARCHAR(20) NOT NULL DEFAULT 'gnews',
             status VARCHAR(20) NOT NULL DEFAULT 'new',
             wp_post_id BIGINT UNSIGNED DEFAULT NULL,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -48,6 +49,7 @@ class Portal_News_Radar_DB {
             UNIQUE KEY idx_content_hash (content_hash),
             KEY idx_status (status),
             KEY idx_topic (topic),
+            KEY idx_api_source (api_source),
             KEY idx_published (published_at),
             KEY idx_gnews_url (gnews_url(191))
         ) {$charset};";
@@ -82,8 +84,9 @@ class Portal_News_Radar_DB {
             'published_at'       => ! empty( $data['published_at'] ) ? gmdate( 'Y-m-d H:i:s', strtotime( $data['published_at'] ) ) : null,
             'topic'              => $data['topic'] ?? '',
             'category_suggested' => $data['category_suggested'] ?? '',
+            'api_source'         => $data['api_source'] ?? 'gnews',
             'status'             => 'new',
-        ), array( '%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s' ) );
+        ), array( '%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s' ) );
 
         return $result ? $wpdb->insert_id : false;
     }
@@ -107,12 +110,13 @@ class Portal_News_Radar_DB {
         $table = self::table_name();
 
         $defaults = array(
-            'status'  => '',
-            'topic'   => '',
-            'per_page'=> 50,
-            'page'    => 1,
-            'orderby' => 'published_at',
-            'order'   => 'DESC',
+            'status'     => '',
+            'topic'      => '',
+            'api_source' => '',
+            'per_page'   => 50,
+            'page'       => 1,
+            'orderby'    => 'published_at',
+            'order'      => 'DESC',
         );
         $args = wp_parse_args( $args, $defaults );
 
@@ -126,6 +130,10 @@ class Portal_News_Radar_DB {
         if ( ! empty( $args['topic'] ) ) {
             $where .= " AND topic = %s";
             $params[] = $args['topic'];
+        }
+        if ( ! empty( $args['api_source'] ) ) {
+            $where .= " AND api_source = %s";
+            $params[] = $args['api_source'];
         }
 
         $allowed_order = array( 'published_at', 'created_at', 'title', 'topic', 'status' );
@@ -158,12 +166,30 @@ class Portal_News_Radar_DB {
             $where .= " AND topic = %s";
             $params[] = $args['topic'];
         }
+        if ( ! empty( $args['api_source'] ) ) {
+            $where .= " AND api_source = %s";
+            $params[] = $args['api_source'];
+        }
 
         $sql = "SELECT COUNT(*) FROM {$table} {$where}";
         if ( ! empty( $params ) ) {
             $sql = $wpdb->prepare( $sql, ...$params );
         }
         return intval( $wpdb->get_var( $sql ) );
+    }
+
+    /** Count stories grouped by api_source */
+    public static function count_by_source() {
+        global $wpdb;
+        $table = self::table_name();
+        $results = $wpdb->get_results(
+            "SELECT api_source, COUNT(*) as cnt FROM {$table} GROUP BY api_source",
+            OBJECT_K
+        );
+        return array(
+            'gnews'   => isset( $results['gnews'] ) ? intval( $results['gnews']->cnt ) : 0,
+            'newsapi' => isset( $results['newsapi'] ) ? intval( $results['newsapi']->cnt ) : 0,
+        );
     }
 
     /** Normalize title for dedup */

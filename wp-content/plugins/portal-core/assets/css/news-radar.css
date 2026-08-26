@@ -26,6 +26,31 @@
 .status-actions { display: flex; gap: 8px; align-items: center; }
 #nr-api-result { font-size: 13px; margin-left: 8px; }
 
+/* Source summary bar */
+.newsradar-source-summary {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.source-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 6px;
+    font-size: 13px; font-weight: 600;
+    background: #f6f7f7; color: #50575e;
+}
+.source-badge.active { background: #e8f5e9; color: #1a7a3a; }
+.source-badge.inactive { background: #fce4ec; color: #b71c1c; }
+.source-gnews { border-left: 3px solid #2196F3; }
+.source-newsapi { border-left: 3px solid #ff9800; }
+
+/* API source column badge */
+.api-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.api-gnews { background: #e3f2fd; color: #1565c0; }
+.api-newsapi { background: #fff3e0; color: #e65100; }
+
 /* Cron info */
 .newsradar-cron-info {
     display: flex; gap: 24px; padding: 10px 16px;

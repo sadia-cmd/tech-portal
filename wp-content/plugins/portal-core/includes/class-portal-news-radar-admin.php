@@ -22,7 +22,8 @@ class Portal_News_Radar_Admin {
         // AJAX handlers
         add_action( 'wp_ajax_newsradar_fetch', array( $this, 'ajax_fetch' ) );
         add_action( 'wp_ajax_newsradar_action', array( $this, 'ajax_action' ) );
-        add_action( 'wp_ajax_newsradar_test_api', array( $this, 'ajax_test_api' ) );
+        add_action( 'wp_ajax_newsradar_test_gnews', array( $this, 'ajax_test_gnews' ) );
+        add_action( 'wp_ajax_newsradar_test_newsapi', array( $this, 'ajax_test_newsapi' ) );
         // Cron
         add_action( 'newsradar_cron_fetch', array( $this, 'cron_fetch' ) );
     }
@@ -51,13 +52,23 @@ class Portal_News_Radar_Admin {
         ) );
     }
 
-    /* ─── AJAX: Test API ─── */
-    public function ajax_test_api() {
+    /* ─── AJAX: Test GNews API ─── */
+    public function ajax_test_gnews() {
         check_ajax_referer( 'newsradar_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Unauthorized' );
 
         $fetcher = new Portal_News_Radar_Fetcher();
-        $result  = $fetcher->test_connection();
+        $result  = $fetcher->test_gnews();
+        wp_send_json( $result );
+    }
+
+    /* ─── AJAX: Test NewsAPI ─── */
+    public function ajax_test_newsapi() {
+        check_ajax_referer( 'newsradar_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Unauthorized' );
+
+        $fetcher = new Portal_News_Radar_Fetcher();
+        $result  = $fetcher->test_newsapi();
         wp_send_json( $result );
     }
 
@@ -67,8 +78,8 @@ class Portal_News_Radar_Admin {
         if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Unauthorized' );
 
         $fetcher = new Portal_News_Radar_Fetcher();
-        if ( ! $fetcher->has_key() ) {
-            wp_send_json_error( 'GNEWS_API_KEY not configured.' );
+        if ( ! $fetcher->has_any_key() ) {
+            wp_send_json_error( 'No API keys configured. Add GNEWS_API_KEY or NEWSAPI_KEY to .env.' );
         }
 
         $summary = $fetcher->fetch_all();
@@ -206,7 +217,7 @@ class Portal_News_Radar_Admin {
     /* ─── Cron Fetch ─── */
     public function cron_fetch() {
         $fetcher = new Portal_News_Radar_Fetcher();
-        if ( ! $fetcher->has_key() ) return;
+        if ( ! $fetcher->has_any_key() ) return;
         $fetcher->fetch_all();
     }
 
@@ -215,7 +226,9 @@ class Portal_News_Radar_Admin {
         global $wpdb;
         $table = Portal_News_Radar_DB::table_name();
         $fetcher = new Portal_News_Radar_Fetcher();
-        $has_key = $fetcher->has_key();
+        $has_gnews   = $fetcher->has_gnews_key();
+        $has_newsapi = $fetcher->has_newsapi_key();
+        $has_any     = $fetcher->has_any_key();
 
         $counts = array(
             'all'       => Portal_News_Radar_DB::count_stories(),
@@ -223,22 +236,26 @@ class Portal_News_Radar_Admin {
             'drafted'   => Portal_News_Radar_DB::count_stories( array( 'status' => 'drafted' ) ),
             'ignored'   => Portal_News_Radar_DB::count_stories( array( 'status' => 'ignored' ) ),
         );
+        $source_counts = Portal_News_Radar_DB::count_by_source();
 
         // Filter
-        $filter_status = sanitize_text_field( $_GET['status'] ?? '' );
-        $filter_topic  = sanitize_text_field( $_GET['topic'] ?? '' );
-        $current_page  = max( 1, intval( $_GET['paged'] ?? 1 ) );
+        $filter_status     = sanitize_text_field( $_GET['status'] ?? '' );
+        $filter_topic      = sanitize_text_field( $_GET['topic'] ?? '' );
+        $filter_api_source = sanitize_text_field( $_GET['api_source'] ?? '' );
+        $current_page      = max( 1, intval( $_GET['paged'] ?? 1 ) );
 
         $stories = Portal_News_Radar_DB::get_stories( array(
-            'status'   => $filter_status,
-            'topic'    => $filter_topic,
-            'per_page' => 20,
-            'page'     => $current_page,
+            'status'     => $filter_status,
+            'topic'      => $filter_topic,
+            'api_source' => $filter_api_source,
+            'per_page'   => 20,
+            'page'       => $current_page,
         ) );
 
         $total = Portal_News_Radar_DB::count_stories( array(
-            'status' => $filter_status,
-            'topic'  => $filter_topic,
+            'status'     => $filter_status,
+            'topic'      => $filter_topic,
+            'api_source' => $filter_api_source,
         ) );
         $total_pages = max( 1, ceil( $total / 20 ) );
 
@@ -250,11 +267,14 @@ class Portal_News_Radar_Admin {
         <div class="wrap news-radar-wrap">
             <h1>📡 News Radar</h1>
 
-            <?php if ( ! $has_key ): ?>
+            <?php if ( ! $has_any ): ?>
             <div class="notice notice-error">
-                <p><strong>GNEWS_API_KEY is not configured.</strong></p>
-                <p>Add your GNews API key to <code>/root/workspace/tech-media-portal/.env</code> as <code>GNEWS_API_KEY=your_key_here</code>, or define it in <code>wp-config.php</code>.</p>
-                <p>Get a free key at <a href="https://gnews.io/register" target="_blank">gnews.io/register</a> (100 requests/day free tier).</p>
+                <p><strong>No API keys configured.</strong></p>
+                <p>Add your API keys to <code>/root/workspace/tech-media-portal/.env</code>:</p>
+                <ul>
+                    <li><code>GNEWS_API_KEY=your_key</code> — Primary source. Get free key at <a href="https://gnews.io/register" target="_blank">gnews.io/register</a></li>
+                    <li><code>NEWSAPI_KEY=your_key</code> — Secondary/fallback. Get free key at <a href="https://newsapi.org/register" target="_blank">newsapi.org/register</a></li>
+                </ul>
             </div>
             <?php endif; ?>
 
@@ -267,10 +287,21 @@ class Portal_News_Radar_Admin {
                     <div class="status-card ignored"><span class="num"><?php echo $counts['ignored']; ?></span><span class="label">Ignored</span></div>
                 </div>
                 <div class="status-actions">
-                    <button id="nr-test-api" class="button" <?php echo $has_key ? '' : 'disabled'; ?>>🔌 Test API</button>
-                    <button id="nr-fetch-now" class="button button-primary" <?php echo $has_key ? '' : 'disabled'; ?>>⚡ Fetch Now</button>
+                    <button id="nr-test-gnews" class="button" <?php echo $has_gnews ? '' : 'disabled'; ?>>🔌 Test GNews</button>
+                    <button id="nr-test-newsapi" class="button" <?php echo $has_newsapi ? '' : 'disabled'; ?>>🔌 Test NewsAPI</button>
+                    <button id="nr-fetch-now" class="button button-primary" <?php echo $has_any ? '' : 'disabled'; ?>>⚡ Fetch Now</button>
                     <span id="nr-api-result"></span>
                 </div>
+            </div>
+
+            <!-- API source summary -->
+            <div class="newsradar-source-summary">
+                <span class="source-badge source-gnews <?php echo $has_gnews ? 'active' : 'inactive'; ?>">
+                    <?php echo $has_gnews ? '✅' : '❌'; ?> GNews: <?php echo $source_counts['gnews']; ?> stories
+                </span>
+                <span class="source-badge source-newsapi <?php echo $has_newsapi ? 'active' : 'inactive'; ?>">
+                    <?php echo $has_newsapi ? '✅' : '❌'; ?> NewsAPI: <?php echo $source_counts['newsapi']; ?> stories
+                </span>
             </div>
 
             <!-- Cron info -->
@@ -281,12 +312,17 @@ class Portal_News_Radar_Admin {
 
             <!-- Filters -->
             <div class="newsradar-filters">
-                <a href="?page=news-radar" class="button <?php echo empty( $filter_status ) ? 'button-primary' : ''; ?>">All (<?php echo $counts['all']; ?>)</a>
+                <a href="?page=news-radar" class="button <?php echo empty( $filter_status ) && empty( $filter_api_source ) ? 'button-primary' : ''; ?>">All (<?php echo $counts['all']; ?>)</a>
                 <a href="?page=news-radar&status=new" class="button <?php echo $filter_status === 'new' ? 'button-primary' : ''; ?>">New (<?php echo $counts['new']; ?>)</a>
                 <a href="?page=news-radar&status=drafted" class="button <?php echo $filter_status === 'drafted' ? 'button-primary' : ''; ?>">Drafted (<?php echo $counts['drafted']; ?>)</a>
                 <a href="?page=news-radar&status=ignored" class="button <?php echo $filter_status === 'ignored' ? 'button-primary' : ''; ?>">Ignored (<?php echo $counts['ignored']; ?>)</a>
                 <span class="separator">|</span>
-                <select id="nr-topic-filter" onchange="window.location='?page=news-radar&topic='+this.value+'&status=<?php echo esc_attr( $filter_status ); ?>'">
+                <select id="nr-source-filter" onchange="window.location='?page=news-radar&api_source='+this.value+'&status=<?php echo esc_attr( $filter_status ); ?>'">
+                    <option value="">All Sources</option>
+                    <option value="gnews" <?php selected( $filter_api_source, 'gnews' ); ?>>GNews (<?php echo $source_counts['gnews']; ?>)</option>
+                    <option value="newsapi" <?php selected( $filter_api_source, 'newsapi' ); ?>>NewsAPI (<?php echo $source_counts['newsapi']; ?>)</option>
+                </select>
+                <select id="nr-topic-filter" onchange="window.location='?page=news-radar&topic='+this.value+'&status=<?php echo esc_attr( $filter_status ); ?>&api_source=<?php echo esc_attr( $filter_api_source ); ?>'">
                     <option value="">All Topics</option>
                     <?php foreach ( Portal_News_Radar_Fetcher::TOPICS as $k => $v ): ?>
                     <option value="<?php echo esc_attr( $k ); ?>" <?php selected( $filter_topic, $k ); ?>><?php echo esc_html( $v ); ?></option>
@@ -297,15 +333,16 @@ class Portal_News_Radar_Admin {
             <!-- Stories table -->
             <?php if ( empty( $stories ) ): ?>
             <div class="newsradar-empty">
-                <p>📭 No stories found.<?php echo $has_key ? ' Click <strong>Fetch Now</strong> to pull stories from GNews.' : ' Configure your API key above to get started.'; ?></p>
+                <p>📭 No stories found.<?php echo $has_any ? ' Click <strong>Fetch Now</strong> to pull stories from GNews + NewsAPI.' : ' Configure your API keys above to get started.'; ?></p>
             </div>
             <?php else: ?>
             <table class="wp-list-table widefat fixed striped newsradar-table">
                 <thead>
                     <tr>
-                        <th class="column-title" style="width:30%">Headline</th>
-                        <th style="width:10%">Topic</th>
-                        <th style="width:12%">Source</th>
+                        <th class="column-title" style="width:25%">Headline</th>
+                        <th style="width:9%">Topic</th>
+                        <th style="width:10%">Source</th>
+                        <th style="width:8%">API</th>
                         <th style="width:10%">Category</th>
                         <th style="width:10%">Published</th>
                         <th style="width:8%">Status</th>
@@ -326,6 +363,9 @@ class Portal_News_Radar_Admin {
                         </td>
                         <td><span class="topic-badge topic-<?php echo esc_attr( $s->topic ); ?>"><?php echo esc_html( $s->topic ); ?></span></td>
                         <td><?php echo esc_html( $s->source_name ?: '—' ); ?></td>
+                        <td>
+                            <span class="api-badge api-<?php echo esc_attr( $s->api_source ); ?>"><?php echo esc_html( strtoupper( $s->api_source ) ); ?></span>
+                        </td>
                         <td><?php echo esc_html( $s->category_suggested ?: '—' ); ?></td>
                         <td><?php echo $s->published_at ? gmdate( 'M j, Y g:i a', strtotime( $s->published_at ) ) : '—'; ?></td>
                         <td><span class="status-badge status-<?php echo esc_attr( $s->status ); ?>"><?php echo esc_html( $s->status ); ?></span></td>
