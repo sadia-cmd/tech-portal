@@ -274,3 +274,77 @@ VPS (Ubuntu 24.04, 2 cores, 5.8GB RAM)
 | `assets/js/news-radar.js` | Dual test handlers, fetch result shows per-source counts |
 | `assets/css/news-radar.css` | Source summary badges, API column badges |
 | `.env` | Added `NEWSAPI_KEY` |
+
+---
+
+## Phase 3B — YouTube Integration + Web Channel Sync ✅
+
+**Last Updated:** 2026-08-27
+
+### What Was Built
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| YouTube Data API v3 integration | ✅ | Server-side fetching with `YOUTUBE_API_KEY` |
+| Channel detection | ✅ | Fetches from configured `YOUTUBE_CHANNEL_ID` |
+| Video metadata cache | ✅ | `wp_portal_youtube_cache` table with dedup |
+| Auto-create Episodes | ✅ | Creates WP Episode posts from YouTube videos |
+| Auto-update Episodes | ✅ | Updates existing episodes matched by YouTube ID |
+| YouTube Sync admin page | ✅ | Test Connection, Sync Now buttons, cached videos table |
+| Manual sync button | ✅ | Instant sync with status display |
+| Hourly cron sync | ✅ | `portal_youtube_sync` scheduled every hour |
+| YouTube player (16:9) | ✅ | Responsive iframe on episode and Web Channel pages |
+| LIVE badge | ✅ | Animated red badge for live broadcasts |
+| UPCOMING badge | ✅ | Orange badge for scheduled streams |
+| Duration display | ✅ | Shows on cards, hero, and episode pages |
+| View count display | ✅ | Shows on cards, hero, and episode pages |
+| Episode meta box | ✅ | YouTube fields + featured checkbox + sync status |
+| Manual episode creation | ✅ | Still available for non-synced content |
+| Episode archive | ✅ | `/web-channel/` page with hero + grid |
+| Related content | ✅ | Related articles + episodes on single episode |
+| Thumbnail download | ✅ | Auto-downloads YouTube thumbnails to WP media |
+
+### How It Works
+
+1. **Admin triggers sync** (manual or cron) → YouTube Data API v3
+2. **Fetches uploads** from channel's uploads playlist
+3. **Fetches video details** (duration, views, live status)
+4. **Creates/updates Episodes** in WordPress
+5. **Caches metadata** in `wp_portal_youtube_cache` table
+6. **Templates display** YouTube iframe, badges, metadata
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `includes/class-portal-youtube.php` | YouTube API fetcher, sync engine, singleton |
+| `includes/class-portal-youtube-db.php` | Custom table for video cache |
+| `includes/class-portal-youtube-admin.php` | Admin page, AJAX handlers, cron |
+| `portal-core.php` | Added YouTube includes + cron schedule |
+| `assets/css/youtube-sync.css` | Admin page styles |
+| `assets/js/youtube-sync.js` | AJAX test/sync handlers |
+| `themes/techportal/web-channel.php` | YouTube player, LIVE/UPCOMING badges |
+| `themes/techportal/single-portal_episode.php` | YouTube player, badges, metadata |
+| `themes/techportal/functions.php` | Enhanced Episode meta box with YouTube fields |
+
+### Configuration Required
+
+| Key | Source | Status |
+|-----|--------|--------|
+| `YOUTUBE_API_KEY` | Google Cloud Console | ⚠️ Needs user input |
+| `YOUTUBE_CHANNEL_ID` | YouTube channel settings | ⚠️ Needs user input |
+
+### Tested
+
+| Test | Result |
+|------|--------|
+| Plugin loads without errors | ✅ |
+| YouTube classes registered | ✅ |
+| DB table created (`wp_portal_youtube_cache`) | ✅ |
+| Admin page loads (`/wp-admin/admin.php?page=youtube-sync`) | ✅ |
+| Web Channel page loads (`/web-channel/`) | ✅ |
+| Single Episode page loads (`/episode/...`) | ✅ |
+| YouTube player renders when ID present | ✅ |
+| LIVE badge renders | ✅ |
+| UPCOMING badge renders | ✅ |
+| Cron scheduled (`portal_youtube_sync`) | ✅ |

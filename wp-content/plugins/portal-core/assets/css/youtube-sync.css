@@ -1,0 +1,54 @@
+/* YouTube Sync Admin Styles */
+.youtube-sync-wrap { max-width: 1200px; }
+.youtube-sync-wrap h1 { font-size: 24px; margin-bottom: 16px; }
+
+/* Status bar */
+.yt-sync-status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px; margin: 16px 0;
+    padding: 16px 20px; background: #fff; border: 1px solid #c3c4c7;
+    border-radius: 8px;
+}
+.yt-status-cards { display: flex; gap: 16px; }
+.yt-status-card {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 20px; border-radius: 8px; background: #f0f0f1;
+}
+.yt-status-card__num { font-size: 24px; font-weight: 700; color: #1d2327; }
+.yt-status-card__label { font-size: 12px; color: #646970; text-transform: uppercase; }
+.yt-status-card--live { background: #e8f5e9; }
+.yt-status-card--time { background: #f0f7fc; }
+
+.yt-sync-actions { display: flex; gap: 8px; align-items: center; }
+#yt-result { font-size: 13px; margin-left: 8px; }
+
+/* Channel info */
+.yt-channel-info {
+    padding: 10px 16px; background: #f6f7f7;
+    border-left: 4px solid #ff0000; margin-bottom: 16px;
+    font-size: 13px; color: #50575e;
+}
+
+/* Badges */
+.yt-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+}
+.yt-badge--live { background: #fce4ec; color: #c62828; }
+.yt-badge--upcoming { background: #fff3e0; color: #e65100; }
+.yt-badge--published { background: #e8f5e9; color: #2e7d32; }
+
+/* Empty state */
+.yt-empty {
+    padding: 60px 20px; text-align: center; background: #fff;
+    border: 1px solid #c3c4c7; border-radius: 8px; color: #646970;
+}
+
+/* Table */
+.yt-videos-table { margin-top: 0; }
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .yt-sync-status-bar { flex-direction: column; }
+    .yt-status-cards { flex-wrap: wrap; }
+}

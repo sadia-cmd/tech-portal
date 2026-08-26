@@ -64,6 +64,11 @@ final class Portal_Core {
         require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar-fetcher.php';
         require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar-admin.php';
         require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar.php';
+
+        // Phase 3B — YouTube Integration
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-youtube-db.php';
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-youtube.php';
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-youtube-admin.php';
     }
 
     /**
@@ -82,6 +87,25 @@ final class Portal_Core {
 
         // Phase 3A — News Radar
         Portal_News_Radar::instance();
+
+        // Phase 3B — YouTube Integration
+        Portal_YouTube_DB::instance()->create_table();
+        Portal_YouTube_Admin::instance();
+        Portal_YouTube_Admin::instance()->schedule_cron();
+
+        // Register custom cron interval
+        add_filter( 'cron_schedules', array( $this, 'add_youtube_cron_interval' ) );
+    }
+
+    /**
+     * Add custom cron interval for YouTube sync
+     */
+    public function add_youtube_cron_interval( $schedules ) {
+        $schedules['portal_youtube_hourly'] = array(
+            'interval' => HOUR_IN_SECONDS,
+            'display'  => __( 'Every Hour', 'portal-core' ),
+        );
+        return $schedules;
     }
 
     /**

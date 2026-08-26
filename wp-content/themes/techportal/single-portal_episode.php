@@ -20,6 +20,10 @@ $guest_title = get_post_meta( get_the_ID(), 'guest_title', true );
 $company     = get_post_meta( get_the_ID(), 'company_name', true );
 $show_name   = get_post_meta( get_the_ID(), 'show_name', true );
 $show_name   = $show_name ? $show_name : 'Web Channel';
+$is_live     = get_post_meta( get_the_ID(), 'youtube_is_live', true );
+$is_upcoming = get_post_meta( get_the_ID(), 'youtube_is_upcoming', true );
+$duration    = get_post_meta( get_the_ID(), 'youtube_duration', true );
+$view_count  = get_post_meta( get_the_ID(), 'youtube_view_count', true );
 
 // Get topic taxonomy
 $topics   = get_the_terms( get_the_ID(), 'portal_topic' );
@@ -111,17 +115,40 @@ $related_episode_query = new WP_Query( $related_args );
                             <?php echo esc_html( $topic_name ); ?>
                         </span>
                     <?php endif; ?>
+                    <?php if ( $duration ) : ?>
+                        <span>⏱ <?php echo esc_html( $duration ); ?></span>
+                    <?php endif; ?>
+                    <?php if ( $view_count ) : ?>
+                        <span>👁 <?php echo number_format( $view_count ); ?> views</span>
+                    <?php endif; ?>
                 </div>
 
-                <!-- 16:9 YouTube Media Area -->
+                <!-- YouTube Player / Media Area -->
                 <?php if ( $youtube_id ) : ?>
-                <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--tp-radius-lg);overflow:hidden;margin-bottom:var(--tp-space-8);display:flex;align-items:center;justify-content:center;">
-                    <div style="color:rgba(255,255,255,0.4);text-align:center;">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto var(--tp-space-3);display:block;">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                        <p style="font-size:var(--tp-text-sm);margin:0;">YouTube Video ID: <?php echo esc_html( $youtube_id ); ?></p>
-                    </div>
+                <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--tp-radius-lg);overflow:hidden;margin-bottom:var(--tp-space-8);">
+                    <iframe
+                        src="https://www.youtube.com/embed/<?php echo esc_attr( $youtube_id ); ?>?rel=0&modestbranding=1"
+                        style="width:100%;height:100%;border:none;"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        title="<?php echo esc_attr( get_the_title() ); ?>"
+                    ></iframe>
+
+                    <!-- LIVE Badge -->
+                    <?php if ( $is_live ) : ?>
+                        <div style="position:absolute;top:var(--tp-space-3);left:var(--tp-space-3);background:#c62828;color:#fff;padding:4px 12px;border-radius:var(--tp-radius-sm);font-size:var(--tp-text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1s infinite;"></span>
+                            LIVE
+                        </div>
+                        <style>@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }</style>
+                    <?php endif; ?>
+
+                    <!-- UPCOMING Badge -->
+                    <?php if ( $is_upcoming && ! $is_live ) : ?>
+                        <div style="position:absolute;top:var(--tp-space-3);left:var(--tp-space-3);background:#e65100;color:#fff;padding:4px 12px;border-radius:var(--tp-radius-sm);font-size:var(--tp-text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">
+                            🕐 UPCOMING
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <?php elseif ( has_post_thumbnail() ) : ?>
                 <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--tp-radius-lg);overflow:hidden;margin-bottom:var(--tp-space-8);">
@@ -215,10 +242,16 @@ $related_episode_query = new WP_Query( $related_args );
                                 <dd style="font-size:var(--tp-text-sm);font-weight:var(--tp-weight-medium);color:#fff;"><?php echo esc_html( $topic_name ); ?></dd>
                             </div>
                             <?php endif; ?>
-                            <?php if ( $youtube_id ) : ?>
+                            <?php if ( $duration ) : ?>
                             <div>
-                                <dt style="font-size:var(--tp-text-xs);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);font-weight:var(--tp-weight-semibold);margin-bottom:var(--tp-space-1);">YouTube ID</dt>
-                                <dd style="font-size:var(--tp-text-sm);font-weight:var(--tp-weight-medium);color:var(--tp-accent);"><?php echo esc_html( $youtube_id ); ?></dd>
+                                <dt style="font-size:var(--tp-text-xs);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);font-weight:var(--tp-weight-semibold);margin-bottom:var(--tp-space-1);">Duration</dt>
+                                <dd style="font-size:var(--tp-text-sm);font-weight:var(--tp-weight-medium);color:#fff;"><?php echo esc_html( $duration ); ?></dd>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ( $view_count ) : ?>
+                            <div>
+                                <dt style="font-size:var(--tp-text-xs);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);font-weight:var(--tp-weight-semibold);margin-bottom:var(--tp-space-1);">Views</dt>
+                                <dd style="font-size:var(--tp-text-sm);font-weight:var(--tp-weight-medium);color:#fff;"><?php echo number_format( $view_count ); ?></dd>
                             </div>
                             <?php endif; ?>
                         </dl>

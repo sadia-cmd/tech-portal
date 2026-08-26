@@ -350,18 +350,50 @@ function tp_episode_meta_box_callback( $post ) {
     $fields = array(
         'youtube_id'     => esc_html__( 'YouTube Video ID', 'techportal' ),
         'guest_name'     => esc_html__( 'Guest Name', 'techportal' ),
-        'guest_company'  => esc_html__( 'Guest Company', 'techportal' ),
+        'guest_title'    => esc_html__( 'Guest Title', 'techportal' ),
+        'guest_company'  => esc_html__( 'Guest Company / Startup', 'techportal' ),
         'show_name'      => esc_html__( 'Show Name', 'techportal' ),
         'topic'          => esc_html__( 'Topic', 'techportal' ),
+        'is_featured'    => esc_html__( 'Featured Episode', 'techportal' ),
     );
     echo '<table class="form-table"><tbody>';
     foreach ( $fields as $key => $label ) {
-        $value = get_post_meta( $post->ID, '_tp_episode_' . $key, true );
-        printf(
-            '<tr><th><label for="tp_episode_%s">%s</label></th><td><input type="text" id="tp_episode_%s" name="tp_episode_%s" value="%s" class="regular-text" /></td></tr>',
-            esc_attr( $key ), esc_html( $label ), esc_attr( $key ), esc_attr( $key ), esc_attr( $value )
-        );
+        if ( $key === 'is_featured' ) {
+            $value = get_post_meta( $post->ID, '_tp_episode_' . $key, true );
+            printf(
+                '<tr><th><label for="tp_episode_%s">%s</label></th><td><input type="checkbox" id="tp_episode_%s" name="tp_episode_%s" value="1" %s /> %s</td></tr>',
+                esc_attr( $key ), esc_html( $label ), esc_attr( $key ), esc_attr( $key ),
+                checked( $value, '1', false ),
+                esc_html__( 'Mark as featured on Web Channel page', 'techportal' )
+            );
+        } else {
+            $value = get_post_meta( $post->ID, '_tp_episode_' . $key, true );
+            printf(
+                '<tr><th><label for="tp_episode_%s">%s</label></th><td><input type="text" id="tp_episode_%s" name="tp_episode_%s" value="%s" class="regular-text" /></td></tr>',
+                esc_attr( $key ), esc_html( $label ), esc_attr( $key ), esc_attr( $key ), esc_attr( $value )
+            );
+        }
     }
+
+    // Show YouTube sync status (read-only)
+    $yt_synced = get_post_meta( $post->ID, 'youtube_video_id', true );
+    $yt_views  = get_post_meta( $post->ID, 'youtube_view_count', true );
+    $yt_duration = get_post_meta( $post->ID, 'youtube_duration', true );
+    $yt_live   = get_post_meta( $post->ID, 'youtube_is_live', true );
+    $yt_upcoming = get_post_meta( $post->ID, 'youtube_is_upcoming', true );
+
+    if ( $yt_synced ) {
+        echo '<tr><th>' . esc_html__( 'YouTube Sync', 'techportal' ) . '</th><td>';
+        echo '<div style="padding:8px 12px;background:#f0f0f1;border-radius:4px;font-size:13px;">';
+        echo '✅ ' . esc_html__( 'Synced from YouTube', 'techportal' );
+        if ( $yt_live ) echo ' · <span style="color:#c62828;font-weight:600;">🔴 LIVE</span>';
+        if ( $yt_upcoming && ! $yt_live ) echo ' · <span style="color:#e65100;font-weight:600;">🕐 UPCOMING</span>';
+        if ( $yt_duration ) echo ' · ⏱ ' . esc_html( $yt_duration );
+        if ( $yt_views ) echo ' · 👁 ' . number_format( $yt_views ) . ' views';
+        echo '</div>';
+        echo '</td></tr>';
+    }
+
     echo '</tbody></table>';
 }
 
@@ -369,12 +401,14 @@ function tp_save_episode_meta( $post_id ) {
     if ( ! isset( $_POST['tp_episode_nonce'] ) || ! wp_verify_nonce( $_POST['tp_episode_nonce'], 'tp_episode_meta_nonce' ) ) return;
     if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
     if ( ! current_user_can( 'edit_post', $post_id ) ) return;
-    $fields = array( 'youtube_id', 'guest_name', 'guest_company', 'show_name', 'topic' );
+    $fields = array( 'youtube_id', 'guest_name', 'guest_title', 'guest_company', 'show_name', 'topic' );
     foreach ( $fields as $key ) {
         if ( isset( $_POST['tp_episode_' . $key] ) ) {
             update_post_meta( $post_id, '_tp_episode_' . $key, sanitize_text_field( $_POST['tp_episode_' . $key] ) );
         }
     }
+    // Featured checkbox
+    update_post_meta( $post_id, '_tp_episode_is_featured', isset( $_POST['tp_episode_is_featured'] ) ? '1' : '0' );
 }
 add_action( 'save_post', 'tp_save_episode_meta' );
 

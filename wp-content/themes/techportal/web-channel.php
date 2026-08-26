@@ -39,33 +39,64 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
     <div class="tp-container">
         <?php if ( $featured_episode ) : ?>
             <?php
-            $youtube_id = get_post_meta( $featured_episode->ID, 'youtube_video_id', true );
-            $guest_name = get_post_meta( $featured_episode->ID, 'guest_name', true );
-            $schedule   = get_post_meta( $featured_episode->ID, 'episode_schedule', true );
+            $youtube_id  = get_post_meta( $featured_episode->ID, 'youtube_video_id', true );
+            $guest_name  = get_post_meta( $featured_episode->ID, 'guest_name', true );
+            $is_live     = get_post_meta( $featured_episode->ID, 'youtube_is_live', true );
+            $is_upcoming = get_post_meta( $featured_episode->ID, 'youtube_is_upcoming', true );
+            $duration    = get_post_meta( $featured_episode->ID, 'youtube_duration', true );
+            $view_count  = get_post_meta( $featured_episode->ID, 'youtube_view_count', true );
             ?>
 
-            <!-- 16:9 Media Placeholder Area -->
-            <div style="position:relative;border-radius:var(--tp-radius-lg);overflow:hidden;margin-bottom:var(--tp-space-8);aspect-ratio:16/9;background:#000;display:flex;align-items:center;justify-content:center;">
-                <?php if ( has_post_thumbnail( $featured_episode->ID ) ) : ?>
-                    <?php echo get_the_post_thumbnail( $featured_episode->ID, 'techportal-hero', array(
-                        'style'   => 'width:100%;height:100%;object-fit:cover;',
-                        'loading' => false,
-                    ) ); ?>
-                <?php endif; ?>
-
-                <!-- Play Icon Overlay -->
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                    <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.3);transition:transform 0.2s;">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- YouTube Video ID Badge -->
+            <!-- 16:9 YouTube Player or Thumbnail -->
+            <div style="position:relative;border-radius:var(--tp-radius-lg);overflow:hidden;margin-bottom:var(--tp-space-8);aspect-ratio:16/9;background:#000;">
                 <?php if ( $youtube_id ) : ?>
-                    <div style="position:absolute;bottom:var(--tp-space-3);right:var(--tp-space-3);background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:var(--tp-radius-sm);font-size:var(--tp-text-xs);color:rgba(255,255,255,0.7);">
-                        YouTube: <?php echo esc_html( $youtube_id ); ?>
+                    <!-- YouTube iframe embed -->
+                    <iframe
+                        src="https://www.youtube.com/embed/<?php echo esc_attr( $youtube_id ); ?>?rel=0&modestbranding=1"
+                        style="width:100%;height:100%;border:none;"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        title="<?php echo esc_attr( $featured_episode->post_title ); ?>"
+                    ></iframe>
+
+                    <!-- LIVE Badge -->
+                    <?php if ( $is_live ) : ?>
+                        <div style="position:absolute;top:var(--tp-space-3);left:var(--tp-space-3);background:#c62828;color:#fff;padding:4px 12px;border-radius:var(--tp-radius-sm);font-size:var(--tp-text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1s infinite;"></span>
+                            LIVE
+                        </div>
+                        <style>@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }</style>
+                    <?php endif; ?>
+
+                    <!-- UPCOMING Badge -->
+                    <?php if ( $is_upcoming && ! $is_live ) : ?>
+                        <div style="position:absolute;top:var(--tp-space-3);left:var(--tp-space-3);background:#e65100;color:#fff;padding:4px 12px;border-radius:var(--tp-radius-sm);font-size:var(--tp-text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">
+                            🕐 UPCOMING
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Duration Badge -->
+                    <?php if ( $duration && ! $is_live && ! $is_upcoming ) : ?>
+                        <div style="position:absolute;bottom:var(--tp-space-3);right:var(--tp-space-3);background:rgba(0,0,0,0.8);color:#fff;padding:4px 8px;border-radius:var(--tp-radius-sm);font-size:var(--tp-text-xs);">
+                            <?php echo esc_html( $duration ); ?>
+                        </div>
+                    <?php endif; ?>
+                <?php elseif ( has_post_thumbnail( $featured_episode->ID ) ) : ?>
+                    <!-- Thumbnail fallback with play icon -->
+                    <div style="position:relative;width:100%;height:100%;">
+                        <?php echo get_the_post_thumbnail( $featured_episode->ID, 'techportal-hero', array(
+                            'style'   => 'width:100%;height:100%;object-fit:cover;',
+                            'loading' => false,
+                        ) ); ?>
+                        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                            <a href="<?php echo esc_url( get_permalink( $featured_episode->ID ) ); ?>" style="text-decoration:none;">
+                                <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.3);transition:transform 0.2s;">
+                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff">
+                                        <polygon points="5 3 19 12 5 21 5 3"/>
+                                    </svg>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -86,10 +117,16 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
                     </p>
                 </div>
                 <div class="tp-col-4" style="display:flex;flex-direction:column;gap:var(--tp-space-3);">
-                    <?php if ( $schedule ) : ?>
+                    <?php if ( $duration ) : ?>
                         <div style="font-size:var(--tp-text-sm);color:rgba(255,255,255,0.6);">
-                            <strong style="color:rgba(255,255,255,0.9);">Schedule:</strong>
-                            <?php echo esc_html( $schedule ); ?>
+                            <strong style="color:rgba(255,255,255,0.9);">Duration:</strong>
+                            <?php echo esc_html( $duration ); ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ( $view_count ) : ?>
+                        <div style="font-size:var(--tp-text-sm);color:rgba(255,255,255,0.6);">
+                            <strong style="color:rgba(255,255,255,0.9);">Views:</strong>
+                            <?php echo number_format( $view_count ); ?>
                         </div>
                     <?php endif; ?>
                     <div style="font-size:var(--tp-text-sm);color:rgba(255,255,255,0.6);">
@@ -154,6 +191,10 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
                 while ( $episode_query->have_posts() ) : $episode_query->the_post();
                     $ep_youtube_id = get_post_meta( get_the_ID(), 'youtube_video_id', true );
                     $ep_guest      = get_post_meta( get_the_ID(), 'guest_name', true );
+                    $ep_is_live    = get_post_meta( get_the_ID(), 'youtube_is_live', true );
+                    $ep_is_upcoming = get_post_meta( get_the_ID(), 'youtube_is_upcoming', true );
+                    $ep_duration   = get_post_meta( get_the_ID(), 'youtube_duration', true );
+                    $ep_views      = get_post_meta( get_the_ID(), 'youtube_view_count', true );
                 ?>
                 <article class="tp-card tp-card--standard">
                     <?php if ( has_post_thumbnail() ) : ?>
@@ -161,7 +202,7 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
                             <a href="<?php the_permalink(); ?>">
                                 <?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
                             </a>
-                            <!-- Play Icon -->
+                            <!-- Play Icon + Status -->
                             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
                                 <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
@@ -169,6 +210,22 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
                                     </svg>
                                 </div>
                             </div>
+                            <!-- Live/Upcoming Badges -->
+                            <?php if ( $ep_is_live ) : ?>
+                                <div style="position:absolute;top:8px;left:8px;background:#c62828;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;">
+                                    🔴 LIVE
+                                </div>
+                            <?php elseif ( $ep_is_upcoming ) : ?>
+                                <div style="position:absolute;top:8px;left:8px;background:#e65100;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;">
+                                    🕐 UPCOMING
+                                </div>
+                            <?php endif; ?>
+                            <!-- Duration -->
+                            <?php if ( $ep_duration && ! $ep_is_live && ! $ep_is_upcoming ) : ?>
+                                <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;">
+                                    <?php echo esc_html( $ep_duration ); ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php else : ?>
                         <div class="tp-card__image" style="background:linear-gradient(135deg,var(--tp-purple),var(--tp-blue));display:flex;align-items:center;justify-content:center;">
@@ -193,8 +250,8 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
 
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:var(--tp-space-3);border-top:1px solid var(--tp-border);font-size:var(--tp-text-xs);color:var(--tp-muted);">
                             <span><?php echo esc_html( get_the_date( 'M j, Y' ) ); ?></span>
-                            <?php if ( $ep_youtube_id ) : ?>
-                                <span>YT: <?php echo esc_html( $ep_youtube_id ); ?></span>
+                            <?php if ( $ep_views ) : ?>
+                                <span>👁 <?php echo number_format( $ep_views ); ?></span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -204,7 +261,7 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
         <?php else : ?>
             <!-- Empty State -->
             <div style="text-align:center;padding:var(--tp-space-16) 0;background:var(--tp-bg-secondary);border-radius:var(--tp-radius-lg);">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--tp-border)" stroke-width="1.5" style="margin:0 auto var(--tp-space-4);">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--tp-border)" stroke-width="1.5" style="margin:0 auto var(--tp-space-4);display:block;">
                     <polygon points="5 3 19 12 5 21 5 3"/>
                 </svg>
                 <h3 style="font-size:var(--tp-text-xl);margin-bottom:var(--tp-space-2);color:var(--tp-text-secondary);">No Episodes Yet</h3>
