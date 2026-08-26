@@ -189,7 +189,7 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
                             </div>
                         <?php endif; ?>
 
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 18 ) ); ?></p>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
 
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:var(--tp-space-3);border-top:1px solid var(--tp-border);font-size:var(--tp-text-xs);color:var(--tp-muted);">
                             <span><?php echo esc_html( get_the_date( 'M j, Y' ) ); ?></span>

@@ -40,7 +40,7 @@ get_header();
                         <h3 class="tp-card__title">
                             <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                         </h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 18 ) ); ?></p>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                         <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);margin-top:auto;">
                             <?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
                         </div>

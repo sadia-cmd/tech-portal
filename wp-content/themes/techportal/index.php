@@ -43,7 +43,7 @@ get_header();
                             <h2 class="tp-card__title">
                                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                             </h2>
-                            <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 30 ) ); ?></p>
+                            <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                             <?php techportal_post_meta(); ?>
                         </div>
                     </article>
@@ -67,7 +67,7 @@ get_header();
                             <h3 class="tp-card__title">
                                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                             </h3>
-                            <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 20 ) ); ?></p>
+                            <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                             <?php techportal_post_meta(); ?>
                         </div>
                     </article>

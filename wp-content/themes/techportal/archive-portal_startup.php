@@ -26,6 +26,7 @@ get_header();
                 <?php while ( have_posts() ) : the_post();
                     $stages = get_the_terms( get_the_ID(), 'startup_stage' );
                     $stage_name = $stages ? $stages[0]->name : '';
+                    $meta = tp_get_startup_meta( get_the_ID() );
                 ?>
                 <article class="tp-card tp-card--standard">
                     <?php if ( has_post_thumbnail() ) : ?>
@@ -46,8 +47,23 @@ get_header();
                         <h3 class="tp-card__title">
                             <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                         </h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 18 ) ); ?></p>
-                        <?php techportal_post_meta(); ?>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
+                        <?php
+                        $meta_items = array();
+                        if ( ! empty( $meta['industry'] ) ) {
+                            $meta_items[] = esc_html( $meta['industry'] );
+                        }
+                        if ( ! empty( $meta['funding_stage'] ) ) {
+                            $meta_items[] = esc_html( $meta['funding_stage'] );
+                        }
+                        if ( ! empty( $meta['location'] ) ) {
+                            $meta_items[] = '📍 ' . esc_html( $meta['location'] );
+                        }
+                        if ( ! empty( $meta_items ) ) : ?>
+                            <div class="tp-card__meta" style="border-top:none;padding-top:var(--tp-space-2);">
+                                <?php echo implode( '<span>•</span>', $meta_items ); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </article>
                 <?php endwhile; ?>

@@ -43,7 +43,7 @@ $archive_desc = get_the_archive_description();
                 <h2 class="tp-card__title">
                     <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                 </h2>
-                <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 30 ) ); ?></p>
+                <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                 <?php techportal_post_meta(); ?>
             </div>
         </article>
@@ -68,7 +68,7 @@ $archive_desc = get_the_archive_description();
                         <h3 class="tp-card__title">
                             <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                         </h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 18 ) ); ?></p>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                         <?php techportal_post_meta(); ?>
                     </div>
                 </article>

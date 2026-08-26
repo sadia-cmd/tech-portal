@@ -62,13 +62,7 @@ $ai_args = array(
     'post_type'      => array( 'post', 'portal_article' ),
     'post_status'    => 'publish',
     'posts_per_page' => 4,
-    'tax_query'      => array(
-        array(
-            'taxonomy' => 'portal_topic',
-            'field'    => 'slug',
-            'terms'    => array( 'ai', 'cloud' ),
-        ),
-    ),
+    'category_name'  => 'ai-cloud',
     'orderby'        => 'date',
     'order'          => 'DESC',
 );
@@ -351,12 +345,16 @@ if ( $startup_query->have_posts() ) :
                     <h3 class="tp-card__title">
                         <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                     </h3>
-                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
-                    <?php if ( ! empty( $meta['location'] ) ) : ?>
-                        <div style="font-size:var(--tp-text-xs);color:var(--tp-text-secondary);margin-top:auto;padding-top:var(--tp-space-2);">
-                            📍 <?php echo esc_html( $meta['location'] ); ?>
-                        </div>
-                    <?php endif; ?>
+                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
+                    <div class="tp-card__meta" style="border-top:none;padding-top:var(--tp-space-2);">
+                        <?php
+                        $meta_items = array();
+                        if ( ! empty( $meta['industry'] ) ) $meta_items[] = esc_html( $meta['industry'] );
+                        if ( ! empty( $meta['funding_stage'] ) ) $meta_items[] = esc_html( $meta['funding_stage'] );
+                        if ( ! empty( $meta['location'] ) ) $meta_items[] = '📍 ' . esc_html( $meta['location'] );
+                        if ( ! empty( $meta_items ) ) echo implode( '<span style="margin:0 4px;">•</span>', $meta_items );
+                        ?>
+                    </div>
                 </div>
             </article>
             <?php endwhile; wp_reset_postdata(); ?>
@@ -429,7 +427,7 @@ if ( $startup_query->have_posts() ) :
                             Guest: <?php echo esc_html( $ep_meta['guest_name'] ); ?>
                         </div>
                     <?php endif; ?>
-                    <p class="tp-card__excerpt" style="color:rgba(255,255,255,0.6);"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
+                    <p class="tp-card__excerpt" style="color:rgba(255,255,255,0.6);"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                     <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:auto;">
                         <?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
                     </div>
@@ -446,6 +444,7 @@ if ( $startup_query->have_posts() ) :
 // ============================================
 // AI & CLOUD + CYBERSECURITY
 // ============================================
+if ( $ai_query->have_posts() || $cyber_query->have_posts() ) :
 ?>
 <section style="padding:var(--tp-space-10) 0;">
     <div class="tp-container">
@@ -471,7 +470,7 @@ if ( $startup_query->have_posts() ) :
                     <?php endif; ?>
                     <div class="tp-card__body">
                         <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                     </div>
                 </article>
                 <?php
@@ -512,7 +511,7 @@ if ( $startup_query->have_posts() ) :
                     <?php endif; ?>
                     <div class="tp-card__body">
                         <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                     </div>
                 </article>
                 <?php
@@ -534,6 +533,7 @@ if ( $startup_query->have_posts() ) :
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 
 <?php

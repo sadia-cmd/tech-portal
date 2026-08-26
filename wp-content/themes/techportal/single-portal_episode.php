@@ -266,7 +266,7 @@ $related_episode_query = new WP_Query( $related_args );
                     <h3 class="tp-card__title">
                         <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                     </h3>
-                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?></p>
+                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
                     <?php techportal_post_meta(); ?>
                 </div>
             </article>
@@ -305,7 +305,7 @@ $related_episode_query = new WP_Query( $related_args );
                         <a href="<?php the_permalink(); ?>" style="color:#fff;"><?php the_title(); ?></a>
                     </h3>
                     <p class="tp-card__excerpt" style="color:rgba(255,255,255,0.6);">
-                        <?php echo esc_html( wp_trim_words( get_the_excerpt(), 15 ) ); ?>
+                        <?php echo esc_html( wp_trim_excerpt() ); ?>
                     </p>
                     <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:auto;">
                         <?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>

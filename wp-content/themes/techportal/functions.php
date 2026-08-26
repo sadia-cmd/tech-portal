@@ -104,6 +104,21 @@ add_filter( 'excerpt_length', 'techportal_excerpt_length' );
 function techportal_excerpt_more( $more ) { return '&hellip;'; }
 add_filter( 'excerpt_more', 'techportal_excerpt_more' );
 
+/** Remove "Category:", "Tag:", etc. prefix from archive titles */
+function techportal_archive_title_strip_prefix( $title ) {
+    if ( is_category() ) {
+        $title = single_cat_title( '', false );
+    } elseif ( is_tag() ) {
+        $title = single_tag_title( '', false );
+    } elseif ( is_author() ) {
+        $title = get_the_author();
+    } elseif ( is_post_type_archive() ) {
+        $title = post_type_archive_title( '', false );
+    }
+    return $title;
+}
+add_filter( 'get_the_archive_title', 'techportal_archive_title_strip_prefix' );
+
 /** Add custom body classes */
 function techportal_body_classes( $classes ) {
     if ( is_singular() ) $classes[] = 'singular';

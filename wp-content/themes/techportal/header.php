@@ -95,14 +95,6 @@ if ( ! empty( $breaking ) ) : ?>
                 'depth'          => 2,
             ) );
             ?>
-            <div class="tp-nav__actions">
-                <a href="<?php echo esc_url( home_url( '/submit-news/' ) ); ?>" class="tp-nav__link">
-                    <?php esc_html_e( 'Submit News', 'techportal' ); ?>
-                </a>
-                <a href="<?php echo esc_url( home_url( '/advertise/' ) ); ?>" class="tp-nav__link">
-                    <?php esc_html_e( 'Advertise', 'techportal' ); ?>
-                </a>
-            </div>
         </div>
     </nav>
 
