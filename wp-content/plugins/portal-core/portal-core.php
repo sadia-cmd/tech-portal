@@ -68,8 +68,9 @@ final class Portal_Core {
         register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 
         add_action( 'init', array( $this, 'load_textdomain' ) );
-        add_action( 'init', array( 'Portal_CPT', 'instance' ) );
-        add_action( 'init', array( 'Portal_Taxonomies', 'instance' ) );
+        // Bootstrap CPT and Taxonomy classes (constructors add init hooks)
+        Portal_CPT::instance();
+        Portal_Taxonomies::instance();
         add_action( 'rest_api_init', array( 'Portal_REST', 'instance' ) );
         add_action( 'admin_menu', array( 'Portal_Admin', 'instance' ) );
     }

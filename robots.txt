@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Disallow: /?s=
+Disallow: /search/
+
+Sitemap: https://techportal.24.jugaar.ai/wp-sitemap.xml

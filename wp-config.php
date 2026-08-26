@@ -52,7 +52,7 @@ define('WP_MAX_MEMORY_LIMIT', getenv('WP_MAX_MEMORY_LIMIT') ?: '512M');
 
 // ** Custom Directories ** //
 define('WP_CONTENT_DIR', __DIR__ . '/wp-content');
-define('WP_CONTENT_URL', getenv('WP_HOME') ?: 'https://techportal.24.jugaar.ai/wp-content');
+define('WP_CONTENT_URL', rtrim(getenv('WP_HOME') ?: 'https://techportal.24.jugaar.ai', '/') . '/wp-content');
 
 // ** Security ** //
 define('DISALLOW_FILE_EDIT', true);

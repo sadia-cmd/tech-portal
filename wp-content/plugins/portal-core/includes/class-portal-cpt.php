@@ -22,6 +22,10 @@ class Portal_CPT {
         return self::$instance;
     }
 
+    public function __construct() {
+        add_action( 'init', array( $this, 'register' ) );
+    }
+
     public function register() {
         $this->register_article();
         $this->register_startup();

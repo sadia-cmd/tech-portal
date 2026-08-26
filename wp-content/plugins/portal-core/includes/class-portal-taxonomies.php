@@ -20,6 +20,10 @@ class Portal_Taxonomies {
         return self::$instance;
     }
 
+    public function __construct() {
+        add_action( 'init', array( $this, 'register' ) );
+    }
+
     public function register() {
         $this->register_topic();
         $this->register_startup_stage();
