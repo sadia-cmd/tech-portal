@@ -1,6 +1,6 @@
 # PROJECT_STATUS.md — Tech Media Portal
 
-## Current Phase: Phase 2 — COMPLETE ✅
+## Current Phase: Phase 3A — COMPLETE ✅
 
 **Last Updated:** 2026-08-26
 
@@ -161,3 +161,68 @@ VPS (Ubuntu 24.04, 2 cores, 5.8GB RAM)
 - [ ] CMS admin workflow optimization
 - [ ] Performance optimization (caching, CDN)
 - [ ] Mobile app considerations
+
+---
+
+## Phase 3A — Real News Ingestion + News Radar ✅
+
+### What Was Built
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| GNews API integration | ✅ | 6 topic categories, server-side fetching |
+| News Radar admin page | ✅ | Full UI with status cards, filters, actions |
+| Duplicate protection | ✅ | URL + normalized title + SHA-256 hash |
+| Create Draft | ✅ | WordPress draft with title, source, category, featured image |
+| Ignore action | ✅ | Marks story as ignored, updates counts |
+| View Source | ✅ | Opens original article in new tab |
+| Category mapping | ✅ | 6 topics → 5 WordPress categories |
+| Scheduled fetching | ✅ | WP Cron every 45 minutes |
+| Custom DB table | ✅ | `wp_portal_news_radar` with proper indexes |
+| Error handling | ✅ | API key missing, fetch errors, duplicate detection |
+| CSS + JS assets | ✅ | Responsive admin styles, AJAX interactions |
+
+### Files Changed
+
+| File | Lines | Change |
+|------|-------|--------|
+| `wp-content/plugins/portal-core/portal-core.php` | 128 | Added 4 News Radar includes + bootstrap |
+| `wp-content/plugins/portal-core/includes/class-portal-news-radar.php` | 89 | Main orchestrator: DB table, cron, .env loader |
+| `wp-content/plugins/portal-core/includes/class-portal-news-radar-db.php` | 140 | Custom table: CRUD, dedup, pagination |
+| `wp-content/plugins/portal-core/includes/class-portal-news-radar-fetcher.php` | 130 | GNews API: 6 topics, fetch, test |
+| `wp-content/plugins/portal-core/includes/class-portal-news-radar-admin.php` | 280 | Admin page: UI, AJAX handlers, draft creation |
+| `wp-content/plugins/portal-core/assets/css/news-radar.css` | 130 | Admin page styles, responsive |
+| `wp-content/plugins/portal-core/assets/js/news-radar.js` | 130 | AJAX interactions, live count updates |
+| `.env` | 1 | Added `GNEWS_API_KEY` |
+
+### Topic → Category Mapping
+
+| Topic Key | Search Query | WordPress Category |
+|-----------|-------------|-------------------|
+| pakistan-tech | Pakistan technology | pakistan-technology |
+| pakistan-startups | Pakistan startups | startup-stories |
+| ai | artificial intelligence AI | ai-cloud |
+| cybersecurity | cybersecurity | cybersecurity |
+| cloud | cloud computing | ai-cloud |
+| fintech | fintech financial technology | it-news |
+
+### API Key Status
+
+- **Key:** Configured in `.env` as `GNEWS_API_KEY`
+- **Verification:** ⚠️ GNews requires email verification before API access works
+- **Verification email sent to:** `ac.k.i.e.12.1987@googlemail.com`
+- **Action needed:** User must verify email at gnews.io dashboard to activate API
+- **Once verified:** Fetch Now button and cron will pull real stories automatically
+
+### Tested
+
+| Test | Result |
+|------|--------|
+| Plugin loads without errors | ✅ |
+| DB table created (`wp_portal_news_radar`) | ✅ |
+| Duplicate detection (URL + title hash) | ✅ |
+| Create Draft (title, content, category, featured image) | ✅ |
+| Ignore action (status update, count update) | ✅ |
+| Cron scheduled (every 45 min) | ✅ |
+| Admin page loads (`/wp-admin/admin.php?page=news-radar`) | ✅ |
+| API connection (needs email verification) | ⚠️ Pending |

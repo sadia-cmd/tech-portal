@@ -1,0 +1,97 @@
+/* News Radar Admin Styles */
+.news-radar-wrap { max-width: 1400px; }
+.news-radar-wrap h1 { font-size: 24px; margin-bottom: 16px; }
+
+/* Status bar */
+.newsradar-status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px; margin: 16px 0;
+    padding: 16px 20px; background: #fff; border: 1px solid #c3c4c7;
+    border-radius: 8px;
+}
+.status-cards { display: flex; gap: 16px; }
+.status-card {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 20px; border-radius: 8px; background: #f0f0f1;
+}
+.status-card .num { font-size: 28px; font-weight: 700; color: #1d2327; }
+.status-card .label { font-size: 12px; color: #646970; text-transform: uppercase; }
+.status-card.new { background: #fcf0f1; }
+.status-card.new .num { color: #b32d2e; }
+.status-card.drafted { background: #f0f7fc; }
+.status-card.drafted .num { color: #2271b1; }
+.status-card.ignored { background: #f0f0f1; }
+.status-card.ignored .num { color: #646970; }
+
+.status-actions { display: flex; gap: 8px; align-items: center; }
+#nr-api-result { font-size: 13px; margin-left: 8px; }
+
+/* Cron info */
+.newsradar-cron-info {
+    display: flex; gap: 24px; padding: 10px 16px;
+    background: #f6f7f7; border-left: 4px solid #2271b1;
+    margin-bottom: 16px; font-size: 13px; color: #50575e;
+}
+
+/* Filters */
+.newsradar-filters {
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.newsradar-filters .separator { color: #c3c4c7; margin: 0 4px; }
+.newsradar-filters select { height: 32px; }
+
+/* Empty state */
+.newsradar-empty {
+    padding: 60px 20px; text-align: center; background: #fff;
+    border: 1px solid #c3c4c7; border-radius: 8px; color: #646970;
+}
+
+/* Table */
+.newsradar-table { margin-top: 0; }
+.newsradar-table .column-title { width: 30%; }
+.story-title { display: block; margin-bottom: 4px; color: #1d2327; }
+.story-desc { margin: 2px 0 0; font-size: 12px; color: #646970; line-height: 1.4; }
+.story-thumb { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; margin-top: 6px; }
+
+/* Topic badges */
+.topic-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    background: #f0f0f1; color: #50575e; white-space: nowrap;
+}
+.topic-pakistan-tech { background: #dcf5e7; color: #1a7a3a; }
+.topic-pakistan-startups { background: #fef3cd; color: #856404; }
+.topic-ai { background: #e8daef; color: #6c3483; }
+.topic-cybersecurity { background: #fcd5ce; color: #a93226; }
+.topic-cloud { background: #d4edda; color: #155724; }
+.topic-fintech { background: #d1ecf1; color: #0c5460; }
+
+/* Status badges */
+.status-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+}
+.status-new { background: #fcf0f1; color: #b32d2e; }
+.status-drafted { background: #f0f7fc; color: #2271b1; }
+.status-ignored { background: #f0f0f1; color: #646970; }
+
+/* Action buttons */
+.story-actions { white-space: nowrap; }
+.story-actions .button { margin-right: 4px; }
+
+/* Loading spinner */
+.newsradar-loading {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid #c3c4c7; border-top-color: #2271b1;
+    border-radius: 50%; animation: nr-spin .6s linear infinite;
+    vertical-align: middle; margin-left: 6px;
+}
+@keyframes nr-spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .newsradar-status-bar { flex-direction: column; }
+    .status-cards { flex-wrap: wrap; }
+    .newsradar-table .column-title { width: auto; }
+}

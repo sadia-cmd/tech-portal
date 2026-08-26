@@ -58,6 +58,12 @@ final class Portal_Core {
         require_once PORTAL_CORE_DIR . 'includes/class-portal-taxonomies.php'; // Custom Taxonomies
         require_once PORTAL_CORE_DIR . 'includes/class-portal-rest.php';       // REST API Extensions
         require_once PORTAL_CORE_DIR . 'includes/class-portal-admin.php';      // Admin Enhancements
+
+        // Phase 3A — News Radar
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar-db.php';
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar-fetcher.php';
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar-admin.php';
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-news-radar.php';
     }
 
     /**
@@ -73,6 +79,9 @@ final class Portal_Core {
         Portal_Taxonomies::instance();
         add_action( 'rest_api_init', array( 'Portal_REST', 'instance' ) );
         add_action( 'admin_menu', array( 'Portal_Admin', 'instance' ) );
+
+        // Phase 3A — News Radar
+        Portal_News_Radar::instance();
     }
 
     /**
