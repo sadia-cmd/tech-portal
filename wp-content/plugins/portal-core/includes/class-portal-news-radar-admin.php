@@ -41,9 +41,10 @@ class Portal_News_Radar_Admin {
 
     /** Enqueue admin CSS/JS only on our page */
     public function enqueue_assets( $hook ) {
-        if ( strpos( $hook, 'portal-core_page_news-radar' ) === false ) return;
+        // Load on News Radar page — check multiple possible hook patterns
+        if ( strpos( $hook, 'news-radar' ) === false && strpos( $hook, 'portal-core' ) === false ) return;
         wp_enqueue_style( 'portal-news-radar', PORTAL_CORE_URL . 'assets/css/news-radar.css', array(), PORTAL_CORE_VERSION );
-        wp_enqueue_script( 'portal-news-radar', PORTAL_CORE_URL . 'assets/js/news-radar.js', array( 'jquery' ), PORTAL_CORE_VERSION, true );
+        wp_enqueue_script( 'portal-news-radar', PORTAL_CORE_URL . 'assets/js/news-radar.js', array(), PORTAL_CORE_VERSION, true );
         wp_localize_script( 'portal-news-radar', 'newsRadar', array(
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( 'newsradar_nonce' ),

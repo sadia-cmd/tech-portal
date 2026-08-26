@@ -1,135 +1,145 @@
 /**
- * News Radar — Admin JS
+ * News Radar — Admin JS (vanilla, no jQuery)
  */
-(function($) {
+(function() {
     'use strict';
 
-    /* ─── Test API ─── */
-    $('#nr-test-api').on('click', function(e) {
-        e.preventDefault();
-        var $btn = $(this), $result = $('#nr-api-result');
-        $btn.prop('disabled', true).after('<span class="newsradar-loading"></span>');
-        $result.text('');
+    // Wait for DOM
+    document.addEventListener('DOMContentLoaded', function() {
 
-        $.post(newsRadar.ajaxUrl, {
-            action: 'newsradar_test_api',
-            nonce: newsRadar.nonce
-        }, function(res) {
-            $btn.prop('disabled', false).next('.newsradar-loading').remove();
-            if (res.ok) {
-                $result.html('<span style="color:#46b450">✅ ' + res.message + '</span>');
-            } else {
-                $result.html('<span style="color:#b32d2e">❌ ' + res.message + '</span>');
+        function ajaxPost(action, data, callback) {
+            var fd = new FormData();
+            fd.append('action', action);
+            fd.append('nonce', newsRadar.nonce);
+            for (var k in data) fd.append(k, data[k]);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', newsRadar.ajaxUrl, true);
+            xhr.onload = function() {
+                try { callback(null, JSON.parse(xhr.responseText)); }
+                catch(e) { callback(e, null); }
+            };
+            xhr.onerror = function() { callback(new Error('Network error'), null); };
+            xhr.send(fd);
+        }
+
+        /* ─── Test API ─── */
+        var testBtn = document.getElementById('nr-test-api');
+        var fetchBtn = document.getElementById('nr-fetch-now');
+        var resultEl = document.getElementById('nr-api-result');
+
+        if (testBtn) {
+            testBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                testBtn.disabled = true;
+                testBtn.textContent = '⏳ Testing…';
+                resultEl.textContent = '';
+
+                ajaxPost('newsradar_test_api', {}, function(err, res) {
+                    testBtn.disabled = false;
+                    testBtn.textContent = '🔌 Test API';
+                    if (err || !res) {
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ Request failed.</span>';
+                    } else if (res.ok) {
+                        resultEl.innerHTML = '<span style="color:#46b450">✅ ' + res.message + '</span>';
+                    } else {
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ ' + res.message + '</span>';
+                    }
+                });
+            });
+        }
+
+        /* ─── Fetch Now ─── */
+        if (fetchBtn) {
+            fetchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                fetchBtn.disabled = true;
+                fetchBtn.textContent = '⏳ Fetching…';
+                resultEl.textContent = '';
+
+                ajaxPost('newsradar_fetch', {}, function(err, res) {
+                    fetchBtn.disabled = false;
+                    fetchBtn.textContent = '⚡ Fetch Now';
+                    if (err || !res) {
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ Request failed.</span>';
+                    } else if (res.success) {
+                        var d = res.data;
+                        var msg = 'Fetched: ' + d.fetched + ' | New: ' + d.new + ' | Duplicates: ' + d.duplicates;
+                        if (d.errors && Object.keys(d.errors).length) {
+                            msg += ' | Errors: ' + JSON.stringify(d.errors);
+                        }
+                        resultEl.innerHTML = '<span style="color:#46b450">✅ ' + msg + '</span>';
+                        setTimeout(function() { location.reload(); }, 1500);
+                    } else {
+                        resultEl.innerHTML = '<span style="color:#b32d2e">❌ ' + (res.data || 'Unknown error') + '</span>';
+                    }
+                });
+            });
+        }
+
+        /* ─── Story Actions (delegated) ─── */
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.nr-action');
+            if (!btn) return;
+            e.preventDefault();
+
+            var action = btn.getAttribute('data-action');
+            var storyId = btn.getAttribute('data-id');
+
+            if (action === 'view_source') {
+                ajaxPost('newsradar_action', { story_id: storyId, story_action: 'view_source' }, function(err, res) {
+                    if (res && res.success && res.data.url) window.open(res.data.url, '_blank');
+                });
+                return;
             }
-        }).fail(function() {
-            $btn.prop('disabled', false).next('.newsradar-loading').remove();
-            $result.html('<span style="color:#b32d2e">❌ Request failed.</span>');
-        });
-    });
 
-    /* ─── Fetch Now ─── */
-    $('#nr-fetch-now').on('click', function(e) {
-        e.preventDefault();
-        var $btn = $(this), $result = $('#nr-api-result');
-        $btn.prop('disabled', true).text('⏳ Fetching…');
-        $result.text('');
-
-        $.post(newsRadar.ajaxUrl, {
-            action: 'newsradar_fetch',
-            nonce: newsRadar.nonce
-        }, function(res) {
-            $btn.prop('disabled', false).text('⚡ Fetch Now');
-            if (res.success) {
-                var d = res.data;
-                var msg = 'Fetched: ' + d.fetched + ' | New: ' + d.new + ' | Duplicates: ' + d.duplicates;
-                if (Object.keys(d.errors).length) {
-                    msg += ' | Errors: ' + JSON.stringify(d.errors);
-                }
-                $result.html('<span style="color:#46b450">✅ ' + msg + '</span>');
-                // Reload page after 1.5s to show new stories
-                setTimeout(function() { location.reload(); }, 1500);
-            } else {
-                $result.html('<span style="color:#b32d2e">❌ ' + (res.data || 'Unknown error') + '</span>');
+            if (action === 'ignore') {
+                if (!confirm('Ignore this story?')) return;
             }
-        }).fail(function() {
-            $btn.prop('disabled', false).text('⚡ Fetch Now');
-            $result.html('<span style="color:#b32d2e">❌ Request failed.</span>');
-        });
-    });
 
-    /* ─── Story Actions ─── */
-    $(document).on('click', '.nr-action', function(e) {
-        e.preventDefault();
-        var $btn = $(this);
-        var action = $btn.data('action');
-        var storyId = $btn.data('id');
+            if (action === 'create_draft') {
+                btn.disabled = true;
+                btn.textContent = '⏳ Creating…';
+            }
 
-        if (action === 'view_source') {
-            // Open in new tab via AJAX to get URL
-            $.post(newsRadar.ajaxUrl, {
-                action: 'newsradar_action',
-                nonce: newsRadar.nonce,
-                story_id: storyId,
-                story_action: 'view_source'
-            }, function(res) {
-                if (res.success && res.data.url) {
-                    window.open(res.data.url, '_blank');
+            ajaxPost('newsradar_action', { story_id: storyId, story_action: action }, function(err, res) {
+                if (res && res.success) {
+                    if (action === 'create_draft' && res.data.edit_url) {
+                        var row = document.querySelector('tr[data-story-id="' + storyId + '"]');
+                        if (row) {
+                            var actionsCell = row.querySelector('.story-actions');
+                            actionsCell.innerHTML =
+                                '<a href="' + res.data.edit_url + '" class="button button-small" target="_blank">✏️ Edit Draft</a> ' +
+                                '<button class="button button-small nr-action" data-action="view_source" data-id="' + storyId + '">🔗 Source</button>';
+                            var badge = row.querySelector('.status-badge');
+                            if (badge) { badge.className = 'status-badge status-drafted'; badge.textContent = 'drafted'; }
+                        }
+                        // Update counts
+                        var newCount = document.querySelector('.status-card.new .num');
+                        var draftCount = document.querySelector('.status-card.drafted .num');
+                        if (newCount) newCount.textContent = Math.max(0, parseInt(newCount.textContent) - 1);
+                        if (draftCount) draftCount.textContent = parseInt(draftCount.textContent) + 1;
+                    } else if (action === 'ignore') {
+                        var row = document.querySelector('tr[data-story-id="' + storyId + '"]');
+                        if (row) {
+                            var badge = row.querySelector('.status-badge');
+                            if (badge) { badge.className = 'status-badge status-ignored'; badge.textContent = 'ignored'; }
+                            var actionsCell = row.querySelector('.story-actions');
+                            actionsCell.innerHTML =
+                                '<button class="button button-small nr-action" data-action="view_source" data-id="' + storyId + '">🔗 Source</button>';
+                        }
+                        var newCount = document.querySelector('.status-card.new .num');
+                        var ignoredCount = document.querySelector('.status-card.ignored .num');
+                        if (newCount) newCount.textContent = Math.max(0, parseInt(newCount.textContent) - 1);
+                        if (ignoredCount) ignoredCount.textContent = parseInt(ignoredCount.textContent) + 1;
+                    }
+                } else {
+                    alert((res && res.data) || 'Action failed.');
+                    btn.disabled = false;
+                    if (action === 'create_draft') btn.textContent = '📝 Draft';
                 }
             });
-            return;
-        }
-
-        if (action === 'ignore') {
-            if (!confirm('Ignore this story?')) return;
-        }
-
-        if (action === 'create_draft') {
-            $btn.prop('disabled', true).text('⏳ Creating…');
-        }
-
-        $.post(newsRadar.ajaxUrl, {
-            action: 'newsradar_action',
-            nonce: newsRadar.nonce,
-            story_id: storyId,
-            story_action: action
-        }, function(res) {
-            if (res.success) {
-                if (action === 'create_draft' && res.data.edit_url) {
-                    // Show link to edit the draft
-                    var $row = $('tr[data-story-id="' + storyId + '"]');
-                    var $actionsCell = $row.find('.story-actions');
-                    $actionsCell.html(
-                        '<a href="' + res.data.edit_url + '" class="button button-small" target="_blank">✏️ Edit Draft</a> ' +
-                        '<button class="button button-small nr-action" data-action="view_source" data-id="' + storyId + '">🔗 Source</button>'
-                    );
-                    // Update status badge
-                    $row.find('.status-badge').removeClass('status-new').addClass('status-drafted').text('drafted');
-                    // Update counts
-                    var $newCount = $('.status-card.new .num');
-                    var $draftCount = $('.status-card.drafted .num');
-                    $newCount.text(Math.max(0, parseInt($newCount.text()) - 1));
-                    $draftCount.text(parseInt($draftCount.text()) + 1);
-                } else if (action === 'ignore') {
-                    var $row = $('tr[data-story-id="' + storyId + '"]');
-                    $row.find('.status-badge').removeClass('status-new').addClass('status-ignored').text('ignored');
-                    $row.find('.story-actions').html(
-                        '<button class="button button-small nr-action" data-action="view_source" data-id="' + storyId + '">🔗 Source</button>'
-                    );
-                    var $newCount = $('.status-card.new .num');
-                    var $ignoredCount = $('.status-card.ignored .num');
-                    $newCount.text(Math.max(0, parseInt($newCount.text()) - 1));
-                    $ignoredCount.text(parseInt($ignoredCount.text()) + 1);
-                }
-            } else {
-                alert(res.data || 'Action failed.');
-                $btn.prop('disabled', false);
-                if (action === 'create_draft') $btn.text('📝 Draft');
-            }
-        }).fail(function() {
-            alert('Request failed.');
-            $btn.prop('disabled', false);
-            if (action === 'create_draft') $btn.text('📝 Draft');
         });
-    });
 
-})(jQuery);
+    });
+})();
