@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# WordPress
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/debug.log
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+
+# Backups (keep in backups/ only, don't commit large dumps)
+backups/*.sql.gz
+backups/*.tar.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+dist/
+build/
+*.min.js
+*.min.css
+
+# Test artifacts
+tests/output/
+coverage/
+
+# Misc
+*.tmp
+*.bak
