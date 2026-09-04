@@ -3,7 +3,7 @@
  * Front Page Template — Tech Portal Homepage
  *
  * Editorial hierarchy: Breaking → Hero → Top Stories → Editor's Picks →
- * Latest News → Trending → Startups → Web Channel → AI & Cloud →
+ * Latest News → Trending → Startups → Watch → AI & Cloud →
  * Cybersecurity → Sponsors → Newsletter → Footer
  *
  * @package TechPortal
@@ -48,15 +48,6 @@ $startup_args = array(
     'order'          => 'DESC',
 );
 $startup_query = new WP_Query( $startup_args );
-
-$episode_args = array(
-    'post_type'      => 'portal_episode',
-    'post_status'    => 'publish',
-    'posts_per_page' => 4,
-    'orderby'        => 'date',
-    'order'          => 'DESC',
-);
-$episode_query = new WP_Query( $episode_args );
 
 $ai_args = array(
     'post_type'      => array( 'post', 'portal_article' ),
@@ -104,208 +95,118 @@ if ( ! empty( $breaking ) ) :
 </section>
 <?php endif; ?>
 
-
 <?php
 // ============================================
-// HERO STORY + TOP STORIES
+// HERO + TOP STORIES
 // ============================================
 if ( $hero ) :
 ?>
-<section class="tp-hero-section" style="background:var(--tp-ink);padding:var(--tp-space-6) 0;">
-    <div class="tp-container">
-        <div class="tp-grid">
-            <!-- Hero: Major Story (8 cols) -->
-            <div class="tp-col-8" style="position:relative;border-radius:var(--tp-radius-lg);overflow:hidden;">
-                <?php if ( has_post_thumbnail( $hero->ID ) ) : ?>
-                    <a href="<?php echo esc_url( get_permalink( $hero->ID ) ); ?>" style="display:block;">
-                        <?php echo get_the_post_thumbnail( $hero->ID, 'techportal-hero', array(
-                            'style' => 'width:100%;height:100%;object-fit:cover;min-height:420px;',
-                            'loading' => false,
-                        ) ); ?>
+<section class="tp-hero">
+    <div class="tp-container tp-hero__grid">
+        <div class="tp-hero__main">
+            <?php if ( has_post_thumbnail( $hero->ID ) ) : ?>
+                <div class="tp-hero__image">
+                    <a href="<?php echo esc_url( get_permalink( $hero->ID ) ); ?>">
+                        <?php echo get_the_post_thumbnail( $hero->ID, 'techportal-hero', array( 'loading' => false, 'style' => 'width:100%;height:100%;object-fit:cover;border-radius:var(--tp-radius-lg);' ) ); ?>
                     </a>
-                <?php else : ?>
-                    <div style="background:linear-gradient(135deg,var(--tp-purple),var(--tp-blue));min-height:420px;border-radius:var(--tp-radius-lg);"></div>
-                <?php endif; ?>
-                <div style="position:absolute;bottom:0;left:0;right:0;padding:var(--tp-space-8) var(--tp-space-6);background:linear-gradient(transparent,rgba(0,0,0,0.85));">
-                    <div style="margin-bottom:var(--tp-space-2);">
-                        <?php techportal_category_label( $hero->ID ); ?>
-                    </div>
-                    <h1 style="font-size:var(--tp-text-4xl);color:#fff;margin-bottom:var(--tp-space-3);line-height:var(--tp-leading-tight);">
-                        <a href="<?php echo esc_url( get_permalink( $hero->ID ) ); ?>" style="color:#fff;text-decoration:none;">
-                            <?php echo esc_html( $hero->post_title ); ?>
-                        </a>
-                    </h1>
-                    <p style="color:rgba(255,255,255,0.8);font-size:var(--tp-text-base);max-width:600px;line-height:1.6;">
-                        <?php echo esc_html( wp_trim_words( $hero->post_content, 30 ) ); ?>
-                    </p>
-                    <div style="margin-top:var(--tp-space-3);color:rgba(255,255,255,0.6);font-size:var(--tp-text-sm);">
-                        <?php
-                        $author = get_the_author_meta( 'display_name', $hero->post_author );
-                        $date = get_the_date( 'M j, Y', $hero->ID );
-                        $minutes = Portal_Helpers::reading_time( $hero->post_content );
-                        echo esc_html( "$author • $date • {$minutes} min read" );
-                        ?>
-                    </div>
                 </div>
-            </div>
-
-            <!-- Side: Top Stories (4 cols) -->
-            <div class="tp-col-4" style="display:flex;flex-direction:column;gap:var(--tp-space-3);">
-                <div style="font-size:var(--tp-text-xs);font-weight:var(--tp-weight-bold);text-transform:uppercase;letter-spacing:0.08em;color:var(--tp-accent);padding-bottom:var(--tp-space-2);border-bottom:1px solid rgba(255,255,255,0.15);margin-bottom:var(--tp-space-1);">
-                    Top Stories
-                </div>
-                <?php
-                $side_count = 0;
-                if ( $top_query->have_posts() ) :
-                    while ( $top_query->have_posts() && $side_count < 4 ) : $top_query->the_post();
-                        $side_count++;
-                ?>
-                <a href="<?php the_permalink(); ?>" style="display:block;padding:var(--tp-space-3);background:rgba(255,255,255,0.05);border-radius:var(--tp-radius-md);text-decoration:none;border:1px solid rgba(255,255,255,0.08);transition:background 0.2s;">
-                    <div style="font-size:var(--tp-text-xs);color:var(--tp-accent);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">
-                        <?php
-                        $cats = get_the_category( get_the_ID() );
-                        echo esc_html( $cats[0]->name ?? '' );
-                        ?>
-                    </div>
-                    <div style="color:#fff;font-size:var(--tp-text-sm);font-weight:600;line-height:1.35;">
-                        <?php the_title(); ?>
-                    </div>
-                    <div style="color:rgba(255,255,255,0.5);font-size:var(--tp-text-xs);margin-top:4px;">
-                        <?php echo esc_html( Portal_Helpers::reading_time( get_the_content() ) ); ?> min read
-                    </div>
+            <?php else : ?>
+                <div class="tp-hero__image" style="background:linear-gradient(135deg,var(--tp-accent),#0ea5e9);border-radius:var(--tp-radius-lg);"></div>
+            <?php endif; ?>
+            <div class="tp-hero__overlay">
+                <a href="<?php echo esc_url( get_category_link( get_post_meta( $hero->ID, '_category_id', true ) ?: 0 ) ); ?>" class="tp-badge tp-badge--primary">
+                    <?php echo esc_html( get_the_category( $hero->ID )[0]->name ?? 'News' ); ?>
                 </a>
-                <?php
-                    endwhile;
-                    wp_reset_postdata();
-                endif;
-                ?>
+                <h1 class="tp-hero__title">
+                    <a href="<?php echo esc_url( get_permalink( $hero->ID ) ); ?>"><?php echo esc_html( $hero->post_title ); ?></a>
+                </h1>
+                <p class="tp-hero__excerpt"><?php echo esc_html( wp_trim_words( $hero->post_content, 25 ) ); ?></p>
+                <div class="tp-hero__meta">
+                    <span>TechPortal Editorial</span>
+                    <span>•</span>
+                    <span><?php echo esc_html( get_the_date( 'M j, Y', $hero->ID ) ); ?></span>
+                    <span>•</span>
+                    <span><?php echo esc_html( tp_estimate_read_time( $hero->ID ) ); ?> min read</span>
+                </div>
             </div>
+        </div>
+
+        <div class="tp-hero__sidebar">
+            <h2 class="tp-hero__sidebar-title">Top Stories</h2>
+            <?php if ( $top_query->have_posts() ) : ?>
+                <?php while ( $top_query->have_posts() ) : $top_query->the_post(); ?>
+                    <a href="<?php the_permalink(); ?>" class="tp-hero__sidebar-item">
+                        <span class="tp-hero__sidebar-cat"><?php echo esc_html( get_the_category()[0]->name ?? 'News' ); ?></span>
+                        <span class="tp-hero__sidebar-title-link"><?php the_title(); ?></span>
+                        <span class="tp-hero__sidebar-meta"><?php echo esc_html( tp_estimate_read_time() ); ?> min read</span>
+                    </a>
+                <?php endwhile; wp_reset_postdata(); ?>
+            <?php endif; ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
 
-
 <?php
 // ============================================
-// EDITOR'S PICKS / CURATED
+// LATEST NEWS
 // ============================================
-if ( ! empty( $featured ) ) :
+if ( $latest_query->have_posts() ) :
 ?>
-<section style="padding:var(--tp-space-10) 0;">
+<section style="padding:var(--tp-space-8) 0;">
     <div class="tp-container">
         <div class="tp-section-header">
-            <h2 class="tp-section-header__title">Editor's Picks</h2>
-            <a href="<?php echo esc_url( home_url( '/category/pakistan-technology/' ) ); ?>" class="tp-section-header__link">View All →</a>
+            <h2 class="tp-section-header__title">Latest News</h2>
         </div>
-        <div class="tp-grid">
-            <?php
-            $grid_count = 0;
-            foreach ( $featured as $fp ) :
-                setup_postdata( $fp );
-                $grid_count++;
-                $card_class = $grid_count <= 2 ? 'tp-card--feature' : 'tp-card--standard';
-            ?>
-            <article class="tp-card <?php echo esc_attr( $card_class ); ?>">
-                <?php if ( has_post_thumbnail( $fp->ID ) ) : ?>
-                    <div class="tp-card__image">
-                        <a href="<?php echo esc_url( get_permalink( $fp->ID ) ); ?>">
-                            <?php echo get_the_post_thumbnail( $fp->ID, 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
-                        </a>
+        <div class="tp-grid tp-grid--news">
+            <?php while ( $latest_query->have_posts() ) : $latest_query->the_post(); ?>
+                <article class="tp-card tp-card--horizontal">
+                    <?php if ( has_post_thumbnail() ) : ?>
+                        <div class="tp-card__image tp-card__image--sm">
+                            <a href="<?php the_permalink(); ?>">
+                                <?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                    <div class="tp-card__body">
+                        <span class="tp-card__category"><?php echo esc_html( get_the_category()[0]->name ?? 'News' ); ?></span>
+                        <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+                        <div class="tp-card__meta">
+                            <span><?php echo esc_html( get_the_date( 'M j, Y' ) ); ?></span>
+                        </div>
                     </div>
-                <?php endif; ?>
-                <div class="tp-card__body">
-                    <div class="tp-card__category"><?php techportal_category_label( $fp->ID ); ?></div>
-                    <h3 class="tp-card__title">
-                        <a href="<?php echo esc_url( get_permalink( $fp->ID ) ); ?>"><?php echo esc_html( $fp->post_title ); ?></a>
-                    </h3>
-                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( $fp->post_content, 18 ) ); ?></p>
-                    <?php techportal_post_meta( $fp->ID ); ?>
-                </div>
-            </article>
-            <?php endforeach; wp_reset_postdata(); ?>
+                </article>
+            <?php endwhile; wp_reset_postdata(); ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
 
-
 <?php
 // ============================================
-// LATEST NEWS + TRENDING
+// TRENDING
 // ============================================
+if ( ! empty( $trending ) ) :
 ?>
-<section style="padding:var(--tp-space-8) 0;background:var(--tp-bg-secondary);">
+<section style="padding:var(--tp-space-8) 0;background:var(--tp-bg-secondary);border-top:1px solid var(--tp-border);border-bottom:1px solid var(--tp-border);">
     <div class="tp-container">
-        <div class="tp-grid">
-            <!-- Latest News Feed (8 cols) -->
-            <div class="tp-col-8">
-                <div class="tp-section-header">
-                    <h2 class="tp-section-header__title">Latest News</h2>
-                </div>
-                <?php
-                if ( $latest_query->have_posts() ) :
-                    while ( $latest_query->have_posts() ) : $latest_query->the_post();
-                ?>
-                <div class="tp-latest-item">
-                    <span class="tp-latest-item__time"><?php echo esc_html( Portal_Helpers::reading_time( get_the_content() ) ); ?>m</span>
+        <div class="tp-section-header">
+            <h2 class="tp-section-header__title">Trending</h2>
+        </div>
+        <div class="tp-trending-grid">
+            <?php foreach ( $trending as $idx => $tp ) : ?>
+                <a href="<?php echo esc_url( get_permalink( $tp->ID ) ); ?>" class="tp-trending-item">
+                    <span class="tp-trending-number"><?php echo str_pad( $idx + 1, 2, '0', STR_PAD_LEFT ); ?></span>
                     <div>
-                        <div style="margin-bottom:2px;">
-                            <span class="tp-category-label" style="font-size:0.625rem;padding:2px 6px;">
-                                <?php
-                                $cats = get_the_category( get_the_ID() );
-                                echo esc_html( $cats[0]->name ?? 'News' );
-                                ?>
-                            </span>
-                        </div>
-                        <a href="<?php the_permalink(); ?>" class="tp-latest-item__title">
-                            <?php the_title(); ?>
-                        </a>
+                        <span class="tp-trending-cat"><?php echo esc_html( get_the_category( $tp->ID )[0]->name ?? 'News' ); ?></span>
+                        <span class="tp-trending-title"><?php echo esc_html( $tp->post_title ); ?></span>
                     </div>
-                </div>
-                <?php
-                    endwhile;
-                    wp_reset_postdata();
-                endif;
-                ?>
-            </div>
-
-            <!-- Trending (4 cols) -->
-            <div class="tp-col-4">
-                <div class="tp-section-header">
-                    <h2 class="tp-section-header__title">Trending</h2>
-                </div>
-                <?php
-                if ( ! empty( $trending ) ) :
-                    $rank = 1;
-                    foreach ( $trending as $tp ) :
-                        setup_postdata( $tp );
-                ?>
-                <div class="tp-trending-item">
-                    <span class="tp-trending-item__rank"><?php echo esc_html( str_pad( $rank, 2, '0', STR_PAD_LEFT ) ); ?></span>
-                    <div>
-                        <a href="<?php echo esc_url( get_permalink( $tp->ID ) ); ?>" class="tp-latest-item__title" style="display:block;">
-                            <?php echo esc_html( $tp->post_title ); ?>
-                        </a>
-                        <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);margin-top:2px;">
-                            <?php
-                            $cats = get_the_category( $tp->ID );
-                            echo esc_html( $cats[0]->name ?? '' );
-                            ?>
-                        </div>
-                    </div>
-                </div>
-                <?php
-                        $rank++;
-                    endforeach;
-                    wp_reset_postdata();
-                endif;
-                ?>
-            </div>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
-
+<?php endif; ?>
 
 <?php
 // ============================================
@@ -313,125 +214,194 @@ if ( ! empty( $featured ) ) :
 // ============================================
 if ( $startup_query->have_posts() ) :
 ?>
-<section style="padding:var(--tp-space-10) 0;">
+<section style="padding:var(--tp-space-8) 0;">
     <div class="tp-container">
         <div class="tp-section-header">
             <h2 class="tp-section-header__title">🚀 Startup Ecosystem</h2>
             <a href="<?php echo esc_url( home_url( '/startup/' ) ); ?>" class="tp-section-header__link">All Startups →</a>
         </div>
-        <div class="tp-grid">
-            <?php
-            while ( $startup_query->have_posts() ) : $startup_query->the_post();
-                $stages = get_the_terms( get_the_ID(), 'startup_stage' );
-                $stage_name = $stages ? $stages[0]->name : '';
-                $meta = tp_get_startup_meta( get_the_ID() );
-            ?>
-            <article class="tp-card tp-card--standard">
-                <?php if ( has_post_thumbnail() ) : ?>
-                    <div class="tp-card__image">
-                        <a href="<?php the_permalink(); ?>">
-                            <?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
-                        </a>
-                    </div>
-                <?php else : ?>
-                    <div class="tp-card__image" style="background:linear-gradient(135deg,var(--tp-purple),var(--tp-blue));display:flex;align-items:center;justify-content:center;">
-                        <span style="font-size:var(--tp-text-3xl);color:#fff;font-weight:800;"><?php echo esc_html( mb_substr( get_the_title(), 0, 2 ) ); ?></span>
-                    </div>
-                <?php endif; ?>
-                <div class="tp-card__body">
-                    <?php if ( $stage_name ) : ?>
-                        <span class="tp-category-label tp-category-label--purple" style="margin-bottom:var(--tp-space-2);"><?php echo esc_html( $stage_name ); ?></span>
+        <div class="tp-grid tp-grid--startups">
+            <?php while ( $startup_query->have_posts() ) : $startup_query->the_post(); ?>
+                <article class="tp-card tp-card--startup">
+                    <?php if ( has_post_thumbnail() ) : ?>
+                        <div class="tp-card__image">
+                            <a href="<?php the_permalink(); ?>">
+                                <?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
+                            </a>
+                        </div>
                     <?php endif; ?>
-                    <h3 class="tp-card__title">
-                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                    </h3>
-                    <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
-                    <div class="tp-card__meta" style="border-top:none;padding-top:var(--tp-space-2);">
-                        <?php
-                        $meta_items = array();
-                        if ( ! empty( $meta['industry'] ) ) $meta_items[] = esc_html( $meta['industry'] );
-                        if ( ! empty( $meta['funding_stage'] ) ) $meta_items[] = esc_html( $meta['funding_stage'] );
-                        if ( ! empty( $meta['location'] ) ) $meta_items[] = '📍 ' . esc_html( $meta['location'] );
-                        if ( ! empty( $meta_items ) ) echo implode( '<span style="margin:0 4px;">•</span>', $meta_items );
-                        ?>
+                    <div class="tp-card__body">
+                        <span class="tp-card__category"><?php $sm = tp_get_startup_meta( get_the_ID() ); echo esc_html( $sm['industry'] ); ?></span>
+                        <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 20 ) ); ?></p>
+                        <div class="tp-card__meta">
+                            <span><?php echo esc_html( $sm['funding_stage'] ); ?></span>
+                            <span>•</span>
+                            <span>📍 <?php echo esc_html( $sm['location'] ); ?></span>
+                        </div>
                     </div>
-                </div>
-            </article>
+                </article>
             <?php endwhile; wp_reset_postdata(); ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
 
-
 <?php
 // ============================================
-// WEB CHANNEL / EPISODES
+// WATCH — YOUTUBE VIDEO SECTION
 // ============================================
 ?>
 <section style="padding:var(--tp-space-10) 0;background:var(--tp-ink);color:#fff;">
     <div class="tp-container">
         <div class="tp-section-header" style="border-bottom-color:rgba(255,255,255,0.15);">
-            <h2 class="tp-section-header__title" style="color:#fff;">📺 Web Channel</h2>
-            <a href="<?php echo esc_url( home_url( '/web-channel/' ) ); ?>" class="tp-section-header__link">Visit Web Channel →</a>
+            <h2 class="tp-section-header__title" style="color:#fff;">📺 Watch</h2>
+            <a href="<?php echo esc_url( home_url( '/watch/' ) ); ?>" class="tp-section-header__link" style="color:var(--tp-accent);">All Videos →</a>
         </div>
 
-        <!-- TechTalk Live Promo -->
-        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--tp-radius-lg);padding:var(--tp-space-6);margin-bottom:var(--tp-space-8);display:flex;align-items:center;gap:var(--tp-space-6);">
-            <div style="position:relative;width:100%;max-width:560px;aspect-ratio:16/9;background:#000;border-radius:var(--tp-radius-md);overflow:hidden;display:flex;align-items:center;justify-content:center;">
-                <div style="color:rgba(255,255,255,0.3);font-size:var(--tp-text-lg);">Live Stream Area</div>
-                <div style="position:absolute;top:var(--tp-space-3);left:var(--tp-space-3);display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:var(--tp-radius-full);">
-                    <span style="width:8px;height:8px;border-radius:50%;background:#DC2626;animation:tp-pulse 2s ease-in-out infinite;"></span>
-                    <span style="font-size:var(--tp-text-xs);font-weight:600;color:#fff;text-transform:uppercase;">Live</span>
-                </div>
-            </div>
-            <div style="flex:1;">
-                <h3 style="font-size:var(--tp-text-2xl);margin-bottom:var(--tp-space-2);">TechTalk Live</h3>
-                <p style="color:rgba(255,255,255,0.7);font-size:var(--tp-text-sm);margin-bottom:var(--tp-space-3);line-height:1.6;">
-                    Join us every Friday at 8 PM PKT for live discussions on Pakistan's tech ecosystem, startup funding, and emerging technologies.
-                </p>
-                <span style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.5);">Every Friday • 8:00 PM PKT</span>
-            </div>
-        </div>
-
-        <!-- Episodes Grid -->
-        <?php if ( $episode_query->have_posts() ) : ?>
-        <div class="tp-grid">
-            <?php
-            while ( $episode_query->have_posts() ) : $episode_query->the_post();
-                $ep_meta = tp_get_episode_meta( get_the_ID() );
-            ?>
-            <article class="tp-card tp-card--standard" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
-                <?php if ( has_post_thumbnail() ) : ?>
-                    <div class="tp-card__image">
-                        <a href="<?php the_permalink(); ?>">
-                            <?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?>
-                        </a>
-                    </div>
+        <?php
+        // Featured video — latest episode with a YouTube ID
+        $featured_args = array(
+            'post_type'      => 'portal_episode',
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+            'meta_key'       => 'youtube_video_id',
+            'meta_compare'   => '!=',
+            'meta_value'     => '',
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        );
+        $featured_query = new WP_Query( $featured_args );
+        if ( $featured_query->have_posts() ) : $featured_query->the_post();
+            $feat_yt_id   = get_post_meta( get_the_ID(), 'youtube_video_id', true );
+            $feat_show    = get_post_meta( get_the_ID(), '_tp_episode_show_name', true );
+            $feat_guest   = get_post_meta( get_the_ID(), 'guest_name', true );
+            $feat_live    = get_post_meta( get_the_ID(), 'youtube_is_live', true );
+        ?>
+        <div style="display:grid;grid-template-columns:1fr 380px;gap:var(--tp-space-6);margin-bottom:var(--tp-space-8);">
+            <!-- Main Player -->
+            <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--tp-radius-lg);overflow:hidden;">
+                <?php if ( $feat_yt_id ) : ?>
+                    <iframe
+                        src="https://www.youtube.com/embed/<?php echo esc_attr( $feat_yt_id ); ?>?rel=0&modestbranding=1&autoplay=0"
+                        style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        loading="lazy"
+                        title="<?php echo esc_attr( get_the_title() ); ?>"
+                    ></iframe>
                 <?php else : ?>
-                    <div class="tp-card__image" style="background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     </div>
                 <?php endif; ?>
-                <div class="tp-card__body">
-                    <?php if ( ! empty( $ep_meta['show_name'] ) ) : ?>
-                        <div style="font-size:var(--tp-text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--tp-accent);margin-bottom:var(--tp-space-1);">
-                            <?php echo esc_html( $ep_meta['show_name'] ); ?>
-                        </div>
-                    <?php endif; ?>
-                    <h3 class="tp-card__title" style="color:#fff;">
-                        <a href="<?php the_permalink(); ?>" style="color:#fff;"><?php the_title(); ?></a>
-                    </h3>
-                    <?php if ( ! empty( $ep_meta['guest_name'] ) ) : ?>
-                        <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.6);margin-bottom:var(--tp-space-2);">
-                            Guest: <?php echo esc_html( $ep_meta['guest_name'] ); ?>
-                        </div>
-                    <?php endif; ?>
-                    <p class="tp-card__excerpt" style="color:rgba(255,255,255,0.6);"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
-                    <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:auto;">
-                        <?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
+                <?php if ( $feat_live ) : ?>
+                    <div style="position:absolute;top:var(--tp-space-3);left:var(--tp-space-3);display:flex;align-items:center;gap:6px;background:rgba(220,38,38,0.9);padding:4px 12px;border-radius:var(--tp-radius-full);z-index:2;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:tp-pulse 2s ease-in-out infinite;"></span>
+                        <span style="font-size:var(--tp-text-xs);font-weight:700;color:#fff;">LIVE</span>
                     </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Playlist Sidebar -->
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--tp-radius-lg);overflow:hidden;">
+                <div style="padding:var(--tp-space-4);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;">
+                    <h3 style="font-size:var(--tp-text-sm);font-weight:700;color:#fff;margin:0;">Now Playing</h3>
+                    <a href="<?php the_permalink(); ?>" style="font-size:var(--tp-text-xs);color:var(--tp-accent);text-decoration:none;">Watch Full →</a>
                 </div>
+                <div style="padding:var(--tp-space-3) var(--tp-space-4);border-bottom:1px solid rgba(255,255,255,0.08);">
+                    <?php if ( $feat_show ) : ?><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--tp-accent);margin-bottom:4px;"><?php echo esc_html( $feat_show ); ?></div><?php endif; ?>
+                    <h4 style="font-size:var(--tp-text-sm);color:#fff;margin:0 0 4px;line-height:1.4;"><?php the_title(); ?></h4>
+                    <?php if ( $feat_guest ) : ?><div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.5);">Guest: <?php echo esc_html( $feat_guest ); ?></div><?php endif; ?>
+                </div>
+                <div style="overflow-y:auto;max-height:340px;">
+                <?php
+                $playlist_args = array(
+                    'post_type'      => 'portal_episode',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => 8,
+                    'meta_key'       => 'youtube_video_id',
+                    'meta_compare'   => '!=',
+                    'meta_value'     => '',
+                    'orderby'        => 'date',
+                    'order'          => 'DESC',
+                    'post__not_in'   => array( get_the_ID() ),
+                );
+                $playlist_query = new WP_Query( $playlist_args );
+                $pl_idx = 2;
+                if ( $playlist_query->have_posts() ) :
+                    while ( $playlist_query->have_posts() ) : $playlist_query->the_post();
+                        $pl_yt_id  = get_post_meta( get_the_ID(), 'youtube_video_id', true );
+                        $pl_show   = get_post_meta( get_the_ID(), '_tp_episode_show_name', true );
+                        $pl_guest  = get_post_meta( get_the_ID(), 'guest_name', true );
+                ?>
+                    <a href="<?php echo esc_url( home_url( '/watch/?v=' . $pl_yt_id ) ); ?>" style="display:flex;gap:var(--tp-space-3);padding:var(--tp-space-3) var(--tp-space-4);text-decoration:none;color:inherit;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                        <span style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.3);min-width:20px;padding-top:2px;font-weight:600;"><?php echo $pl_idx++; ?></span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.5);margin-bottom:2px;"><?php echo esc_html( $pl_show ?: 'Episode' ); ?></div>
+                            <div style="font-size:var(--tp-text-xs);color:#fff;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?php the_title(); ?></div>
+                            <?php if ( $pl_guest ) : ?><div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;"><?php echo esc_html( $pl_guest ); ?></div><?php endif; ?>
+                        </div>
+                    </a>
+                <?php
+                    endwhile;
+                    wp_reset_postdata();
+                endif;
+                ?>
+                </div>
+            </div>
+        </div>
+        <?php wp_reset_postdata(); endif; ?>
+
+        <!-- Video Grid -->
+        <?php
+        $video_args = array(
+            'post_type'      => 'portal_episode',
+            'post_status'    => 'publish',
+            'posts_per_page' => 8,
+            'meta_key'       => 'youtube_video_id',
+            'meta_compare'   => '!=',
+            'meta_value'     => '',
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        );
+        $video_query = new WP_Query( $video_args );
+        if ( $video_query->have_posts() ) :
+        ?>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--tp-space-5);">
+            <?php
+            while ( $video_query->have_posts() ) : $video_query->the_post();
+                $v_yt_id  = get_post_meta( get_the_ID(), 'youtube_video_id', true );
+                $v_show   = get_post_meta( get_the_ID(), '_tp_episode_show_name', true );
+                $v_guest  = get_post_meta( get_the_ID(), 'guest_name', true );
+                $thumb    = get_the_post_thumbnail_url( get_the_ID(), 'medium' );
+                $yt_thumb = $v_yt_id ? "https://img.youtube.com/vi/{$v_yt_id}/hqdefault.jpg" : '';
+                $img_url  = $thumb ?: $yt_thumb;
+            ?>
+            <article style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--tp-radius-md);overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <a href="<?php echo esc_url( home_url( '/watch/?v=' . $v_yt_id ) ); ?>" style="text-decoration:none;color:inherit;display:block;">
+                    <div style="position:relative;width:100%;aspect-ratio:16/9;background:#111;overflow:hidden;">
+                        <?php if ( $img_url ) : ?>
+                            <img src="<?php echo esc_url( $img_url ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
+                        <?php else : ?>
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </div>
+                        <?php endif; ?>
+                        <!-- Play Button Overlay -->
+                        <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.4)'" onmouseout="this.style.background='rgba(0,0,0,0.2)'">
+                            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,0,0,0.9);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(255,0,0,0.4);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding:var(--tp-space-3);">
+                        <?php if ( $v_show ) : ?><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--tp-accent);margin-bottom:4px;"><?php echo esc_html( $v_show ); ?></div><?php endif; ?>
+                        <h3 style="font-size:var(--tp-text-sm);font-weight:600;color:#fff;line-height:1.4;margin:0 0 4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"><?php the_title(); ?></h3>
+                        <?php if ( $v_guest ) : ?><div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.5);">Guest: <?php echo esc_html( $v_guest ); ?></div><?php endif; ?>
+                        <div style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.35);margin-top:4px;"><?php echo esc_html( get_the_date( 'M j, Y' ) ); ?></div>
+                    </div>
+                </a>
             </article>
             <?php endwhile; wp_reset_postdata(); ?>
         </div>
@@ -446,116 +416,75 @@ if ( $startup_query->have_posts() ) :
 // ============================================
 if ( $ai_query->have_posts() || $cyber_query->have_posts() ) :
 ?>
-<section style="padding:var(--tp-space-10) 0;">
+<section style="padding:var(--tp-space-8) 0;">
     <div class="tp-container">
-        <div class="tp-grid">
-            <!-- AI & Cloud -->
-            <div class="tp-col-6">
+        <div class="tp-grid" style="grid-template-columns:1fr 1fr;gap:var(--tp-space-8);">
+            <?php if ( $ai_query->have_posts() ) : ?>
+            <div>
                 <div class="tp-section-header">
                     <h2 class="tp-section-header__title">🤖 AI & Cloud</h2>
                     <a href="<?php echo esc_url( home_url( '/category/ai-cloud/' ) ); ?>" class="tp-section-header__link">More →</a>
                 </div>
-                <?php
-                if ( $ai_query->have_posts() ) :
-                    $ai_count = 0;
-                    while ( $ai_query->have_posts() ) : $ai_query->the_post();
-                        $ai_count++;
-                        if ( $ai_count === 1 ) :
-                ?>
-                <article class="tp-card" style="margin-bottom:var(--tp-space-4);">
-                    <?php if ( has_post_thumbnail() ) : ?>
-                        <div class="tp-card__image">
-                            <a href="<?php the_permalink(); ?>"><?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?></a>
+                <?php while ( $ai_query->have_posts() ) : $ai_query->the_post(); ?>
+                    <article class="tp-card tp-card--compact">
+                        <div class="tp-card__body">
+                            <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+                            <div class="tp-card__meta"><span><?php echo esc_html( get_the_date( 'M j' ) ); ?></span></div>
                         </div>
-                    <?php endif; ?>
-                    <div class="tp-card__body">
-                        <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
-                    </div>
-                </article>
-                <?php
-                        else :
-                ?>
-                <div class="tp-latest-item">
-                    <div>
-                        <a href="<?php the_permalink(); ?>" class="tp-latest-item__title"><?php the_title(); ?></a>
-                        <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);"><?php echo esc_html( get_the_date( 'M j' ) ); ?></div>
-                    </div>
-                </div>
-                <?php
-                        endif;
-                    endwhile;
-                    wp_reset_postdata();
-                endif;
-                ?>
+                    </article>
+                <?php endwhile; wp_reset_postdata(); ?>
             </div>
+            <?php endif; ?>
 
-            <!-- Cybersecurity -->
-            <div class="tp-col-6">
+            <?php if ( $cyber_query->have_posts() ) : ?>
+            <div>
                 <div class="tp-section-header">
                     <h2 class="tp-section-header__title">🔒 Cybersecurity</h2>
                     <a href="<?php echo esc_url( home_url( '/category/cybersecurity/' ) ); ?>" class="tp-section-header__link">More →</a>
                 </div>
-                <?php
-                if ( $cyber_query->have_posts() ) :
-                    $cy_count = 0;
-                    while ( $cyber_query->have_posts() ) : $cyber_query->the_post();
-                        $cy_count++;
-                        if ( $cy_count === 1 ) :
-                ?>
-                <article class="tp-card" style="margin-bottom:var(--tp-space-4);">
-                    <?php if ( has_post_thumbnail() ) : ?>
-                        <div class="tp-card__image">
-                            <a href="<?php the_permalink(); ?>"><?php the_post_thumbnail( 'techportal-card', array( 'loading' => 'lazy' ) ); ?></a>
+                <?php while ( $cyber_query->have_posts() ) : $cyber_query->the_post(); ?>
+                    <article class="tp-card tp-card--compact">
+                        <div class="tp-card__body">
+                            <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+                            <div class="tp-card__meta"><span><?php echo esc_html( get_the_date( 'M j' ) ); ?></span></div>
                         </div>
-                    <?php endif; ?>
-                    <div class="tp-card__body">
-                        <h3 class="tp-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                        <p class="tp-card__excerpt"><?php echo esc_html( wp_trim_excerpt() ); ?></p>
-                    </div>
-                </article>
-                <?php
-                        else :
-                ?>
-                <div class="tp-latest-item">
-                    <div>
-                        <a href="<?php the_permalink(); ?>" class="tp-latest-item__title"><?php the_title(); ?></a>
-                        <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);"><?php echo esc_html( get_the_date( 'M j' ) ); ?></div>
-                    </div>
-                </div>
-                <?php
-                        endif;
-                    endwhile;
-                    wp_reset_postdata();
-                endif;
-                ?>
+                    </article>
+                <?php endwhile; wp_reset_postdata(); ?>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
 
-
 <?php
 // ============================================
-// SPONSORS (only show if sponsors exist)
+// SPONSORS
 // ============================================
-if ( ! empty( $ponsors ) ) :
+if ( $sponsors ) :
 ?>
-<section style="padding:var(--tp-space-8) 0;border-top:1px solid var(--tp-border);">
+<section style="padding:var(--tp-space-8) 0;background:var(--tp-bg-secondary);border-top:1px solid var(--tp-border);border-bottom:1px solid var(--tp-border);">
     <div class="tp-container">
-        <div style="text-align:center;margin-bottom:var(--tp-space-4);">
-            <span style="font-size:var(--tp-text-xs);text-transform:uppercase;letter-spacing:0.1em;color:var(--tp-text-secondary);font-weight:var(--tp-weight-semibold);">Sponsored</span>
+        <div class="tp-section-header">
+            <h2 class="tp-section-header__title">Partners</h2>
         </div>
-        <div class="tp-grid" style="justify-items:center;">
-            <?php foreach ( $ponsors as $sponsor ) : ?>
-                <div class="tp-sponsor-slot">
-                    <?php if ( $sponsor['image'] ) : ?>
-                        <a href="<?php echo esc_url( $sponsor['url'] ); ?>" target="_blank" rel="noopener">
-                            <img src="<?php echo esc_url( $sponsor['image'] ); ?>" alt="<?php echo esc_attr( $sponsor['label'] ); ?>" style="max-height:60px;">
-                        </a>
-                    <?php else : ?>
-                        <span class="tp-sponsor-slot__label"><?php echo esc_html( $sponsor['label'] ); ?></span>
+        <div style="display:flex;align-items:center;justify-content:center;gap:var(--tp-space-8);flex-wrap:wrap;padding:var(--tp-space-4) 0;">
+            <?php foreach ( $sponsors as $sponsor ) :
+                $sponsor_url  = get_post_meta( $sponsor->ID, '_tp_sponsor_url', true );
+                $sponsor_label = get_post_meta( $sponsor->ID, '_tp_sponsor_label', true );
+                $link_tag = $sponsor_url ? '<a href="' . esc_url( $sponsor_url ) . '" target="_blank" rel="noopener sponsored">' : '';
+                $link_end = $sponsor_url ? '</a>' : '';
+            ?>
+                <div style="text-align:center;opacity:0.6;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                    <?php echo $link_tag; ?>
+                        <?php if ( has_post_thumbnail( $sponsor->ID ) ) : ?>
+                            <?php echo get_the_post_thumbnail( $sponsor->ID, 'medium', array( 'style' => 'max-height:40px;width:auto;filter:grayscale(100%);opacity:0.7;' ) ); ?>
+                        <?php else : ?>
+                            <span style="font-size:var(--tp-text-sm);font-weight:700;color:var(--tp-text-muted);"><?php echo esc_html( $sponsor->post_title ); ?></span>
+                        <?php endif; ?>
+                    <?php echo $link_end; ?>
+                    <?php if ( $sponsor_label ) : ?>
+                        <div style="font-size:10px;color:var(--tp-text-muted);margin-top:4px;"><?php echo esc_html( $sponsor_label ); ?></div>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -564,29 +493,23 @@ if ( ! empty( $ponsors ) ) :
 </section>
 <?php endif; ?>
 
-
 <?php
 // ============================================
 // NEWSLETTER CTA
 // ============================================
 ?>
-<section style="padding:var(--tp-space-10) 0;">
-    <div class="tp-container">
-        <div class="tp-newsletter">
-            <h2 class="tp-newsletter__title">Stay Ahead in Tech</h2>
-            <p class="tp-newsletter__desc">Get Pakistan's top technology news, startup insights, and industry analysis delivered to your inbox every morning.</p>
-            <form class="tp-newsletter__form" data-newsletter="main">
-                <input type="email" class="tp-newsletter__input" placeholder="your@email.com" required aria-label="Email address">
-                <button type="submit" class="tp-newsletter__btn">Subscribe</button>
-            </form>
-            <p style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.4);margin-top:var(--tp-space-3);">No spam. Unsubscribe anytime.</p>
-        </div>
+<section style="padding:var(--tp-space-10) 0;background:var(--tp-accent);color:#fff;text-align:center;">
+    <div class="tp-container" style="max-width:600px;">
+        <h2 style="font-size:var(--tp-text-3xl);font-weight:var(--tp-weight-extrabold);margin-bottom:var(--tp-space-3);">Stay Ahead in Tech</h2>
+        <p style="color:rgba(255,255,255,0.85);margin-bottom:var(--tp-space-6);font-size:var(--tp-text-lg);line-height:1.6;">
+            Get Pakistan's top technology news, startup insights, and industry analysis delivered to your inbox every morning.
+        </p>
+        <form class="tp-newsletter-form" style="display:flex;gap:var(--tp-space-3);max-width:460px;margin:0 auto;" action="#" method="post">
+            <input type="email" name="email" placeholder="your@email.com" required style="flex:1;padding:var(--tp-space-3) var(--tp-space-4);border-radius:var(--tp-radius-md);border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);color:#fff;font-size:var(--tp-text-base);outline:none;" />
+            <button type="submit" style="padding:var(--tp-space-3) var(--tp-space-6);background:#fff;color:var(--tp-accent);border:none;border-radius:var(--tp-radius-md);font-weight:var(--tp-weight-bold);font-size:var(--tp-text-base);cursor:pointer;">Subscribe</button>
+        </form>
+        <p style="font-size:var(--tp-text-xs);color:rgba(255,255,255,0.6);margin-top:var(--tp-space-3);">No spam. Unsubscribe anytime.</p>
     </div>
 </section>
 
-
-<?php
-// Clean up queries
-wp_reset_postdata();
-
-get_footer();
+<?php get_footer(); ?>

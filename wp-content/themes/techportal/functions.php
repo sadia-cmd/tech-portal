@@ -546,3 +546,14 @@ function tp_newsletter_subscribe() {
 }
 add_action( 'wp_ajax_tp_newsletter_subscribe', 'tp_newsletter_subscribe' );
 add_action( 'wp_ajax_nopriv_tp_newsletter_subscribe', 'tp_newsletter_subscribe' );
+
+/**
+ * Estimate reading time for a post.
+ */
+function tp_estimate_read_time( $post_id = 0 ) {
+    if ( ! $post_id ) $post_id = get_the_ID();
+    $content = get_post_field( 'post_content', $post_id );
+    $word_count = str_word_count( strip_tags( $content ) );
+    $minutes = max( 1, ceil( $word_count / 200 ) );
+    return $minutes;
+}
