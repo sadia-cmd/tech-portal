@@ -175,7 +175,7 @@ add_action( 'customize_register', 'techportal_customize_register' );
 
 /** Include theme inc files */
 require_once TECHPORTAL_DIR . '/inc/template-tags.php';
-require_once TECHPORTAL_DIR . '/inc/seo.php';
+// SEO handled by Portal_Phase4 (portal-core plugin)
 
 
 /* =========================================================================

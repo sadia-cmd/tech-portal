@@ -57,6 +57,32 @@ define('WP_CONTENT_URL', rtrim(getenv('WP_HOME') ?: 'https://techportal.24.jugaa
 // ** Security ** //
 define('DISALLOW_FILE_EDIT', true);
 
+// ** Performance & Caching ** //
+define('WP_POST_REVISIONS', 5);
+define('AUTOSAVE_INTERVAL', 300);
+define('EMPTY_TRASH_DAYS', 14);
+define('WP_CRON_LOCK_TIMEOUT', 120);
+
+// ** Auto Updates ** //
+define('WP_AUTO_UPDATE_CORE', 'minor');
+
+// ** Force SSL for Admin ** //
+define('FORCE_SSL_ADMIN', true);
+
+// ** Limit Post Revisions for Speed ** //
+if (!defined('WP_POST_REVISIONS')) {
+    define('WP_POST_REVISIONS', 5);
+}
+
+// ** Disable WordPress ZIP file uploads (security) ** //
+define('ALLOW_UNFILTERED_UPLOADS', false);
+
+// ** Block direct access to wp-config.php ** //
+if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'wp-config.php') {
+    http_response_code(403);
+    exit('Access denied');
+}
+
 // ** Absolute path to WordPress directory ** //
 if (!defined('ABSPATH')) {
     define('ABSPATH', __DIR__ . '/');

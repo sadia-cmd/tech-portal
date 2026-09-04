@@ -75,6 +75,9 @@ final class Portal_Core {
 
         // Phase 3D — Features (Submit, Sponsors, Search, Related, Trending, Video Archive)
         require_once PORTAL_CORE_DIR . 'includes/class-portal-features.php';
+
+        // Phase 4 — Security, Performance, SEO Hardening
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-phase4.php';
     }
 
     /**
@@ -104,6 +107,9 @@ final class Portal_Core {
 
         // Phase 3D — Features
         Portal_Features::instance();
+
+        // Phase 4 — Security, Performance, SEO
+        Portal_Phase4::instance();
 
         // Register custom cron interval
         add_filter( 'cron_schedules', array( $this, 'add_youtube_cron_interval' ) );

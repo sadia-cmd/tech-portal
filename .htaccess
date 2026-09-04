@@ -1,0 +1,76 @@
+# WordPress Tech Portal - Security Hardening
+# Phase 4: Security, Performance
+
+# ─── Block Directory Listing ───
+Options -Indexes
+
+# ─── Block PHP Execution in Uploads ───
+<Files "*.php">
+    # Allow PHP in root (WordPress core)
+</Files>
+
+# ─── Protect wp-config.php ───
+<Files wp-config.php>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ─── Protect .htaccess ───
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ─── Block Sensitive Files ───
+<Files readme.html>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files license.txt>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ─── Block XML-RPC ───
+<Files xmlrpc.php>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ─── Block Author Enumeration ───
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteRule ^author/ - [F,L]
+</IfModule>
+
+# ─── Prevent Script Execution in Uploads ───
+<Directory "/wp-content/uploads">
+    <FilesMatch "\.php$">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# ─── WordPress Pretty Permalinks ───
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteRule ^index\.php$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+</IfModule>
+
+# ─── Security Headers (Apache) ───
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    <FilesMatch "\.(ico|jpe?g|png|gif|webp|avif|woff2?|ttf|eot|svg)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
