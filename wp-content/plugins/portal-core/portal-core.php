@@ -72,6 +72,9 @@ final class Portal_Core {
 
         // Phase 3C — Membership & Bookmarks
         require_once PORTAL_CORE_DIR . 'includes/class-portal-membership.php';
+
+        // Phase 3D — Features (Submit, Sponsors, Search, Related, Trending, Video Archive)
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-features.php';
     }
 
     /**
@@ -98,6 +101,9 @@ final class Portal_Core {
 
         // Phase 3C — Membership & Bookmarks
         Portal_Membership::instance();
+
+        // Phase 3D — Features
+        Portal_Features::instance();
 
         // Register custom cron interval
         add_filter( 'cron_schedules', array( $this, 'add_youtube_cron_interval' ) );

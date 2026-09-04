@@ -147,6 +147,15 @@ the_post_navigation( array(
 if ( comments_open() || get_comments_number() ) {
     comments_template();
 }
+
+// Banner: Mid-content
+if ( is_active_sidebar( 'banner-mid-content' ) ) : ?>
+    <section style="padding:var(--tp-space-6) 0;">
+        <div class="tp-container" style="max-width:720px;">
+            <?php dynamic_sidebar( 'banner-mid-content' ); ?>
+        </div>
+    </section>
+<?php endif;
 ?>
 
 <?php endwhile; ?>

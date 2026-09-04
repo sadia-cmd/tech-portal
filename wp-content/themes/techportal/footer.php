@@ -88,6 +88,15 @@
     </div>
 </footer>
 
+<!-- Footer Banner -->
+<?php if ( is_active_sidebar( 'banner-footer' ) ) : ?>
+<div style="background:var(--tp-bg-secondary);border-top:1px solid var(--tp-border);padding:var(--tp-space-4) 0;">
+    <div class="tp-container" style="text-align:center;">
+        <?php dynamic_sidebar( 'banner-footer' ); ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>
