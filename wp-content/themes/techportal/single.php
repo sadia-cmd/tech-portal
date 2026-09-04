@@ -51,6 +51,20 @@ $related_query = new WP_Query( $related_args );
     </div>
 
     <?php
+    // Source attribution for news radar posts
+    $source_url  = get_post_meta( get_the_ID(), '_news_radar_source_url', true );
+    $source_name = get_post_meta( get_the_ID(), '_news_radar_source_name', true );
+    if ( $source_url ) : ?>
+        <div style="margin:var(--tp-space-6) 0;padding:var(--tp-space-4);background:var(--tp-bg-secondary);border:1px solid var(--tp-border);border-radius:var(--tp-radius-md);font-size:var(--tp-text-sm);">
+            <strong>Originally published by:</strong>
+            <a href="<?php echo esc_url( $source_url ); ?>" target="_blank" rel="noopener noreferrer" style="color:var(--tp-accent);text-decoration:none;">
+                <?php echo esc_html( $source_name ?: wp_parse_url( $source_url, PHP_URL_HOST ) ); ?> →
+            </a>
+        </div>
+    <?php endif;
+    ?>
+
+    <?php
     wp_link_pages( array(
         'before' => '<div class="page-links">Pages:',
         'after'  => '</div>',

@@ -3,7 +3,11 @@ Allow: /
 Disallow: /wp-admin/
 Disallow: /wp-includes/
 Disallow: /wp-content/plugins/
+Disallow: /wp-content/themes/techportal/assets/
+Disallow: /wp-login.php
+Disallow: /xmlrpc.php
+Disallow: /*?replytocom=
 Disallow: /?s=
 Disallow: /search/
 
-Sitemap: https://techportal.24.jugaar.ai/wp-sitemap.xml
+Sitemap: https://newsweb.24.jugaar.ai/sitemap.xml
