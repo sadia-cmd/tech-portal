@@ -155,24 +155,130 @@ $featured_episode = $featured_query->have_posts() ? $featured_query->posts[0] : 
     </div>
 </section>
 
-<!-- Show Information -->
+<!-- Show Information — All Shows -->
 <section style="padding:var(--tp-space-8) 0;background:var(--tp-bg-secondary);">
     <div class="tp-container">
-        <div class="tp-grid" style="align-items:center;">
-            <div class="tp-col-8">
-                <h2 style="font-size:var(--tp-text-2xl);margin-bottom:var(--tp-space-2);">TechTalk Live</h2>
-                <p style="font-size:var(--tp-text-base);color:var(--tp-text-secondary);line-height:1.6;">
-                    Join us every week for live discussions on Pakistan's tech ecosystem, startup funding, and emerging technologies. Featuring interviews with founders, investors, and industry leaders.
+        <div class="tp-section-header">
+            <h2 class="tp-section-header__title">Our Shows</h2>
+        </div>
+        <div class="tp-grid" style="grid-template-columns:repeat(3,1fr);gap:var(--tp-space-6);">
+            <!-- TechTalk Live -->
+            <div style="background:var(--tp-white);border:1px solid var(--tp-border);border-radius:var(--tp-radius-lg);padding:var(--tp-space-6);">
+                <div style="font-size:24px;margin-bottom:var(--tp-space-3);">🎙️</div>
+                <h3 style="font-size:var(--tp-text-xl);margin:0 0 var(--tp-space-2);">TechTalk Live</h3>
+                <p style="font-size:var(--tp-text-sm);color:var(--tp-text-secondary);line-height:1.6;margin-bottom:var(--tp-space-3);">
+                    Weekly live discussions on Pakistan's tech ecosystem, startup funding, and emerging technologies. Featuring interviews with founders, investors, and industry leaders.
                 </p>
+                <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);">
+                    <strong>Schedule:</strong> Fridays 8:00 PM PKT<br>
+                    <strong>Episodes:</strong> <?php
+                        $tt_count = new WP_Query( array( 'post_type'=>'portal_episode','post_status'=>'publish','posts_per_page'=>1,'meta_query'=>array(array('key'=>'_tp_episode_show_name','value'=>'TechTalk Live','compare'=>'LIKE')),'no_found_rows'=>false ) );
+                        echo $tt_count->found_posts . ' published';
+                        wp_reset_postdata();
+                    ?>
+                </div>
             </div>
-            <div class="tp-col-4" style="display:flex;flex-direction:column;gap:var(--tp-space-2);align-items:flex-end;">
-                <span style="font-size:var(--tp-text-sm);color:var(--tp-text-secondary);">
-                    <strong style="color:var(--tp-text-primary);">Schedule:</strong> Weekly • Fridays 8:00 PM PKT
-                </span>
-                <span style="font-size:var(--tp-text-sm);color:var(--tp-text-secondary);">
-                    <strong style="color:var(--tp-text-primary);">Episodes:</strong>
-                    <?php echo esc_html( $episode_query->found_posts ); ?> published
-                </span>
+            <!-- Startup Spotlight -->
+            <div style="background:var(--tp-white);border:1px solid var(--tp-border);border-radius:var(--tp-radius-lg);padding:var(--tp-space-6);">
+                <div style="font-size:24px;margin-bottom:var(--tp-space-3);">🚀</div>
+                <h3 style="font-size:var(--tp-text-xl);margin:0 0 var(--tp-space-2);">Startup Spotlight</h3>
+                <p style="font-size:var(--tp-text-sm);color:var(--tp-text-secondary);line-height:1.6;margin-bottom:var(--tp-space-3);">
+                    Deep-dive interviews with Pakistan's most innovative startup founders. From seed stage to unicorn, we explore the journeys that are shaping the ecosystem.
+                </p>
+                <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);">
+                    <strong>Schedule:</strong> Wednesdays 7:00 PM PKT<br>
+                    <strong>Episodes:</strong> <?php
+                        $ss_count = new WP_Query( array( 'post_type'=>'portal_episode','post_status'=>'publish','posts_per_page'=>1,'meta_query'=>array(array('key'=>'_tp_episode_show_name','value'=>'Startup Spotlight','compare'=>'LIKE')),'no_found_rows'=>false ) );
+                        echo $ss_count->found_posts . ' published';
+                        wp_reset_postdata();
+                    ?>
+                </div>
+            </div>
+            <!-- Deep Dive -->
+            <div style="background:var(--tp-white);border:1px solid var(--tp-border);border-radius:var(--tp-radius-lg);padding:var(--tp-space-6);">
+                <div style="font-size:24px;margin-bottom:var(--tp-space-3);">🔬</div>
+                <h3 style="font-size:var(--tp-text-xl);margin:0 0 var(--tp-space-2);">Deep Dive</h3>
+                <p style="font-size:var(--tp-text-sm);color:var(--tp-text-secondary);line-height:1.6;margin-bottom:var(--tp-space-3);">
+                    In-depth technical explorations of specific technologies and trends. From AI in healthcare to cloud infrastructure, we go beyond the headlines.
+                </p>
+                <div style="font-size:var(--tp-text-xs);color:var(--tp-muted);">
+                    <strong>Schedule:</strong> Bi-weekly, Saturdays 10:00 AM PKT<br>
+                    <strong>Episodes:</strong> <?php
+                        $dd_count = new WP_Query( array( 'post_type'=>'portal_episode','post_status'=>'publish','posts_per_page'=>1,'meta_query'=>array(array('key'=>'_tp_episode_show_name','value'=>'Deep Dive','compare'=>'LIKE')),'no_found_rows'=>false ) );
+                        echo $dd_count->found_posts . ' published';
+                        wp_reset_postdata();
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Show -->
+<section style="padding:var(--tp-space-8) 0;background:linear-gradient(135deg,var(--tp-ink) 0%,#1a1a2e 100%);color:#fff;">
+    <div class="tp-container">
+        <div class="tp-grid" style="align-items:center;grid-template-columns:1fr 1fr;gap:var(--tp-space-8);">
+            <div>
+                <span style="display:inline-block;padding:4px 12px;background:rgba(255,255,255,0.1);border-radius:20px;font-size:var(--tp-text-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--tp-space-4);">🕐 Next Episode</span>
+                <h2 style="font-size:var(--tp-text-3xl);margin:0 0 var(--tp-space-3);line-height:1.2;">
+                    <?php
+                    // Get upcoming episode (marked as upcoming or next by date)
+                    $upcoming_args = array(
+                        'post_type'      => 'portal_episode',
+                        'post_status'    => 'publish',
+                        'posts_per_page' => 1,
+                        'meta_query'     => array( //phpcs:ignore
+                            array( 'key' => 'youtube_is_upcoming', 'value' => '1', 'compare' => '=' ),
+                        ),
+                        'orderby'        => 'date',
+                        'order'          => 'DESC',
+                    );
+                    $upcoming_query = new WP_Query( $upcoming_args );
+                    if ( ! $upcoming_query->have_posts() ) {
+                        // Fallback: latest episode
+                        $upcoming_args['meta_query'] = array(); //phpcs:ignore
+                        $upcoming_query = new WP_Query( $upcoming_args );
+                    }
+                    if ( $upcoming_query->have_posts() ) :
+                        $upcoming_query->the_post();
+                        echo esc_html( get_the_title() );
+                    else :
+                        echo 'Next TechTalk Live — Coming Friday';
+                    endif;
+                    wp_reset_postdata();
+                    ?>
+                </h2>
+                <p style="font-size:var(--tp-text-base);color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:var(--tp-space-4);">
+                    <?php if ( $upcoming_query->have_posts() ) : ?>
+                        <?php
+                        global $post;
+                        $up_guest = get_post_meta( $post->ID, 'guest_name', true );
+                        $up_title = get_post_meta( $post->ID, 'guest_title', true );
+                        $up_show  = get_post_meta( $post->ID, '_tp_episode_show_name', true );
+                        ?>
+                        <?php if ( $up_guest ) : ?>
+                            <strong style="color:#fff;"><?php echo esc_html( $up_guest ); ?></strong>
+                            <?php if ( $up_title ) : ?>
+                                <br><span style="font-size:var(--tp-text-sm);color:rgba(255,255,255,0.5);"><?php echo esc_html( $up_title ); ?></span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <?php if ( $up_show ) : ?>
+                            <br><span style="font-size:var(--tp-text-sm);color:var(--tp-accent);font-weight:600;"><?php echo esc_html( $up_show ); ?></span>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        Join us for our next live discussion on Pakistan's tech ecosystem.
+                    <?php endif; ?>
+                </p>
+                <div style="display:flex;gap:var(--tp-space-3);">
+                    <a href="<?php echo esc_url( home_url( '/video-archive/' ) ); ?>" class="tp-btn tp-btn--primary">View All Episodes</a>
+                    <a href="https://www.youtube.com/@TechPortalPK" target="_blank" rel="noopener" class="tp-btn" style="border:1px solid rgba(255,255,255,0.2);color:#fff;">Subscribe on YouTube</a>
+                </div>
+            </div>
+            <div style="text-align:center;">
+                <div style="width:200px;height:200px;margin:0 auto;border-radius:50%;background:linear-gradient(135deg,var(--tp-accent),var(--tp-purple));display:flex;align-items:center;justify-content:center;animation:pulse-glow 3s ease-in-out infinite;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+                <style>@keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); } 50% { box-shadow: 0 0 30px 10px rgba(99,102,241,0.2); } }</style>
             </div>
         </div>
     </div>

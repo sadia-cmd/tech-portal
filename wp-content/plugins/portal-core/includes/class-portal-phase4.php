@@ -36,7 +36,7 @@ class Portal_Phase4 {
         // Performance
         add_action( 'wp_head', array( $this, 'preconnect_resources' ), 1 );
         add_action( 'wp_head', array( $this, 'remove_head_clutter' ), 999 );
-        add_action( 'wp_footer', array( $this, 'defer_scripts' ), 999 );
+        add_filter( 'script_loader_tag', array( $this, 'defer_scripts' ), 10, 3 );
         add_filter( 'wp_get_attachment_image_attributes', array( $this, 'add_lazy_loading' ), 10, 3 );
         add_filter( 'script_loader_tag', array( $this, 'add_defer_attribute' ), 10, 3 );
 
