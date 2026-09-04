@@ -778,7 +778,7 @@ p {
 .tp-nav__list {
   display: flex;
   list-style: none;
-  gap: var(--tp-space-1);
+  gap: var(--tp-space-2);
   overflow-x: auto;
 }
 
