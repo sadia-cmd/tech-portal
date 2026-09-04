@@ -97,6 +97,25 @@
 </div>
 <?php endif; ?>
 
+<!-- Cookie Consent Banner -->
+<div class="tp-cookie-banner" id="tp-cookie-banner" role="region" aria-label="<?php esc_attr_e( 'Cookie notice', 'techportal' ); ?>" hidden>
+    <div class="tp-container tp-cookie-banner__inner">
+        <p class="tp-cookie-banner__text">
+            <?php
+            printf(
+                /* translators: %s: link to the Cookie Policy page */
+                esc_html__( 'We use cookies to improve your experience and analyze site traffic. Read our %s.', 'techportal' ),
+                '<a href="' . esc_url( home_url( '/cookie-policy/' ) ) . '">' . esc_html__( 'Cookie Policy', 'techportal' ) . '</a>'
+            );
+            ?>
+        </p>
+        <div class="tp-cookie-banner__actions">
+            <button type="button" class="tp-btn tp-btn--ghost tp-cookie-banner__decline"><?php esc_html_e( 'Decline', 'techportal' ); ?></button>
+            <button type="button" class="tp-btn tp-btn--primary tp-cookie-banner__accept"><?php esc_html_e( 'Accept', 'techportal' ); ?></button>
+        </div>
+    </div>
+</div>
+
 <?php wp_footer(); ?>
 </body>
 </html>
