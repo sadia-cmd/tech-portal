@@ -31,11 +31,22 @@ function techportal_post_meta( $post_id = null ) {
     if ( ! $post_id ) $post_id = get_the_ID();
     $author = get_the_author_meta( 'display_name', get_post_field( 'post_author', $post_id ) );
     $date   = get_the_date( 'M j, Y', $post_id );
-    
+
     // Estimate reading time
     $content    = get_post_field( 'post_content', $post_id );
     $word_count = str_word_count( strip_tags( $content ) );
     $minutes    = max( 1, ceil( $word_count / 250 ) );
+
+    // Comment count — only shown when there's something to show
+    $comments      = (int) get_comments_number( $post_id );
+    $comment_html  = '';
+    if ( $comments > 0 ) {
+        $comment_html = sprintf(
+            '<span>•</span><span>%d comment%s</span>',
+            $comments,
+            $comments === 1 ? '' : 's'
+        );
+    }
 
     printf(
         '<div class="tp-card__meta">
@@ -44,10 +55,12 @@ function techportal_post_meta( $post_id = null ) {
             <span>%s</span>
             <span>•</span>
             <span>%d min read</span>
+            %s
         </div>',
         esc_html( $author ),
         esc_html( $date ),
-        $minutes
+        $minutes,
+        $comment_html
     );
 }
 

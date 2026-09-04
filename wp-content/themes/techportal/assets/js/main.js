@@ -160,6 +160,39 @@
     }, { passive: true });
   }
 
+  /* ---- Cookie Consent ---- */
+  var COOKIE_CONSENT_KEY = 'tp_cookie_consent';
+  var cookieBanner = document.getElementById('tp-cookie-banner');
+  if (cookieBanner) {
+    var storedConsent = null;
+    try {
+      storedConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
+    } catch (e) {
+      storedConsent = null;
+    }
+    if (!storedConsent) {
+      cookieBanner.hidden = false;
+    }
+
+    function setCookieConsent(value) {
+      try {
+        localStorage.setItem(COOKIE_CONSENT_KEY, value);
+      } catch (e) {
+        // localStorage unavailable (private mode, etc.) — banner simply won't persist
+      }
+      cookieBanner.hidden = true;
+    }
+
+    var cookieAccept = cookieBanner.querySelector('.tp-cookie-banner__accept');
+    var cookieDecline = cookieBanner.querySelector('.tp-cookie-banner__decline');
+    if (cookieAccept) {
+      cookieAccept.addEventListener('click', function () { setCookieConsent('accepted'); });
+    }
+    if (cookieDecline) {
+      cookieDecline.addEventListener('click', function () { setCookieConsent('declined'); });
+    }
+  }
+
   /* ---- Lazy loading fallback ---- */
   if (!('loading' in HTMLImageElement.prototype)) {
     var lazyImages = document.querySelectorAll('img[loading="lazy"]');

@@ -89,7 +89,7 @@
 
             function loadVideos(page) {
                 page = page || 1;
-                vidResults.innerHTML = '<p class="tp-vid-empty">Searching…</p>';
+                vidResults.innerHTML = '<p class="tp-vid-empty"><span class="tp-spinner tp-spinner--dark"></span>Searching…</p>';
 
                 var params = new URLSearchParams();
                 params.append('action', 'tp_search_episodes');

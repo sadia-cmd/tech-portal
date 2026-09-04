@@ -180,7 +180,7 @@ const infiniteScroll = {
         const page = parseInt(btn.dataset.page || '1') + 1;
         const max = parseInt(btn.dataset.max || '10');
         btn.classList.add('tp-loading');
-        btn.textContent = 'Loading...';
+        btn.innerHTML = '<span class="tp-spinner"></span>Loading...';
 
         fetch(window.location.pathname + '?tp_ajax_load=' + page + '&tp_ajax_type=' + (btn.dataset.type || 'posts'))
             .then(r => r.text())

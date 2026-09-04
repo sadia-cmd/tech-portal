@@ -34,6 +34,9 @@ $author_twitter  = get_post_meta( get_the_ID(), '_tp_author_twitter', true );
 $author_linkedin = get_post_meta( get_the_ID(), '_tp_author_linkedin', true );
 $author_name = get_the_author();
 $author_initial = strtoupper( mb_substr( $author_name, 0, 1 ) );
+$author_id = (int) get_post_field( 'post_author', get_the_ID() );
+$author_avatar_data = get_avatar_data( $author_id, array( 'size' => 72 ) );
+$author_has_avatar = ! empty( $author_avatar_data['found_avatar'] );
 
 // Share URLs
 $share_url   = urlencode( get_permalink() );
@@ -146,7 +149,13 @@ $share_title = urlencode( get_the_title() );
 
     <!-- Author Bio Box -->
     <div class="tp-author-box">
-        <div class="tp-author-box__avatar"><?php echo esc_html( $author_initial ); ?></div>
+        <div class="tp-author-box__avatar">
+            <?php if ( $author_has_avatar ) : ?>
+                <?php echo get_avatar( $author_id, 72, '', esc_attr( $author_name ) ); ?>
+            <?php else : ?>
+                <?php echo esc_html( $author_initial ); ?>
+            <?php endif; ?>
+        </div>
         <div>
             <div class="tp-author-box__name"><?php echo esc_html( $author_name ); ?></div>
             <?php if ( $author_title ) : ?>
@@ -176,7 +185,7 @@ $share_title = urlencode( get_the_title() );
         <div class="tp-section-header">
             <h2 class="tp-section-header__title">Related Stories</h2>
         </div>
-        <div class="tp-grid">
+        <div class="tp-grid tp-grid--related">
             <?php while ( $related_query->have_posts() ) : $related_query->the_post(); ?>
                 <article class="tp-card tp-card--standard">
                     <?php if ( has_post_thumbnail() ) : ?>

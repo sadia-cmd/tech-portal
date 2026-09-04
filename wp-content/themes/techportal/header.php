@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#37215F">
     <link rel="profile" href="https://gmpg.org/xfn/11">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <?php if ( ! has_site_icon() ) :
+        // Fallback favicon so the browser tab never shows a blank generic icon
+        // before a real site icon is set in Appearance → Customize → Site Identity.
+        $techportal_favicon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#37215F"/><text x="32" y="44" font-family="Arial, sans-serif" font-size="32" font-weight="800" fill="#ffffff" text-anchor="middle">T</text></svg>';
+    ?>
+    <link rel="icon" href="data:image/svg+xml;charset=UTF-8,<?php echo rawurlencode( $techportal_favicon_svg ); ?>">
+    <?php endif; ?>
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -21,7 +30,7 @@
             echo esc_html( wp_date( $date_format ) );
             ?>
         </div>
-        <div style="display:flex;gap:1rem;align-items:center;">
+        <div class="tp-header__utility-links">
             <a href="<?php echo esc_url( home_url( '/category/pakistan-technology/' ) ); ?>">Pakistan Tech</a>
             <a href="<?php echo esc_url( home_url( '/category/startup-stories/' ) ); ?>">Startups</a>
             <a href="<?php echo esc_url( home_url( '/web-channel/' ) ); ?>">Web Channel</a>
