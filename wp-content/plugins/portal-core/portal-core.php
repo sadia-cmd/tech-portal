@@ -69,6 +69,9 @@ final class Portal_Core {
         require_once PORTAL_CORE_DIR . 'includes/class-portal-youtube-db.php';
         require_once PORTAL_CORE_DIR . 'includes/class-portal-youtube.php';
         require_once PORTAL_CORE_DIR . 'includes/class-portal-youtube-admin.php';
+
+        // Phase 3C — Membership & Bookmarks
+        require_once PORTAL_CORE_DIR . 'includes/class-portal-membership.php';
     }
 
     /**
@@ -92,6 +95,9 @@ final class Portal_Core {
         Portal_YouTube_DB::instance()->create_table();
         Portal_YouTube_Admin::instance();
         Portal_YouTube_Admin::instance()->schedule_cron();
+
+        // Phase 3C — Membership & Bookmarks
+        Portal_Membership::instance();
 
         // Register custom cron interval
         add_filter( 'cron_schedules', array( $this, 'add_youtube_cron_interval' ) );

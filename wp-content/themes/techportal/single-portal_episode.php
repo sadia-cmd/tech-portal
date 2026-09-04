@@ -207,7 +207,13 @@ $related_episode_query = new WP_Query( $related_args );
                 </div>
                 <?php endif; ?>
 
-                <!-- Episode Description -->
+                <!-- Bookmark + Episode Description -->
+                <div style="display:flex;align-items:center;gap:var(--tp-space-3);margin-bottom:var(--tp-space-4);">
+                    <?php if ( class_exists( 'Portal_Membership' ) ) : ?>
+                        <?php Portal_Membership::instance()->bookmark_button( get_the_ID() ); ?>
+                        <span style="font-size:var(--tp-text-sm);color:var(--tp-muted);">Save this episode</span>
+                    <?php endif; ?>
+                </div>
                 <div style="font-size:var(--tp-text-base);line-height:var(--tp-leading-loose);color:var(--tp-text-primary);">
                     <?php the_content(); ?>
                 </div>

@@ -71,9 +71,9 @@ if ( ! empty( $breaking ) ) : ?>
                 <a href="<?php echo esc_url( home_url( '/newsletter/' ) ); ?>" class="tp-btn tp-btn--outline tp-hide-mobile" aria-label="<?php esc_attr_e( 'Newsletter', 'techportal' ); ?>">
                     <?php esc_html_e( 'Newsletter', 'techportal' ); ?>
                 </a>
-                <a href="<?php echo esc_url( wp_login_url() ); ?>" class="tp-btn tp-btn--primary tp-hide-mobile">
-                    <?php esc_html_e( 'Sign In', 'techportal' ); ?>
-                </a>
+                <div class="tp-hide-mobile">
+                    <?php do_action( 'tp_header_actions' ); ?>
+                </div>
                 <button class="tp-nav-toggle" aria-label="<?php esc_attr_e( 'Toggle navigation', 'techportal' ); ?>" aria-expanded="false" aria-controls="tp-mobile-nav">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M3 12h18M3 6h18M3 18h18"/>
