@@ -19,7 +19,7 @@ define( 'TECHPORTAL_URI', get_template_directory_uri() );
  */
 function techportal_setup() {
     add_theme_support( 'automatic-feed-links' );
-    add_theme_support( 'title-tag' );
+    // Title tag handled by Portal_Phase4 (enhanced per post type)
     add_theme_support( 'post-thumbnails' );
     set_post_thumbnail_size( 1200, 630, true );
     add_image_size( 'techportal-hero', 1400, 700, true );
