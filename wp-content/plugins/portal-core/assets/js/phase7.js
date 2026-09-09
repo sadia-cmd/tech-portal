@@ -1,36 +1,10 @@
 /**
- * Phase 7 — Dark Mode, Infinite Scroll, Social Share, Progress Bar, TOC, Pull Quotes
+ * Phase 7 — Progress Bar, Social Share, TOC, Pull Quotes, Infinite Scroll, Back-to-Top
  * @package PortalCore
  */
 
 (function() {
 'use strict';
-
-/* ─── Dark Mode ─── */
-const dm = {
-    KEY: 'tp_dark_mode',
-    init() {
-        const saved = localStorage.getItem(this.KEY);
-        if (saved === '1' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-        document.querySelectorAll('.tp-dark-toggle').forEach(btn => {
-            btn.addEventListener('click', () => this.toggle());
-            this.updateIcon(btn);
-        });
-    },
-    toggle() {
-        document.documentElement.classList.toggle('dark');
-        const isDark = document.documentElement.classList.contains('dark');
-        localStorage.setItem(this.KEY, isDark ? '1' : '0');
-        document.querySelectorAll('.tp-dark-toggle').forEach(btn => this.updateIcon(btn));
-    },
-    updateIcon(btn) {
-        const isDark = document.documentElement.classList.contains('dark');
-        if (btn.querySelector('.tp-moon')) btn.querySelector('.tp-moon').style.display = isDark ? 'none' : 'block';
-        if (btn.querySelector('.tp-sun')) btn.querySelector('.tp-sun').style.display = isDark ? 'block' : 'none';
-    }
-};
 
 /* ─── Reading Progress Bar ─── */
 const progress = {
@@ -81,7 +55,6 @@ const toc = {
         container.innerHTML = html;
         container.style.display = 'block';
 
-        // Highlight active section
         const links = container.querySelectorAll('.tp-toc__link');
         const observer = new IntersectionObserver(entries => {
             entries.forEach(e => {
@@ -104,7 +77,6 @@ const pullquotes = {
         });
     },
     check() {
-        // Remove existing popup
         const old = document.querySelector('.tp-pullquote-popup');
         if (old) old.remove();
 
@@ -115,7 +87,6 @@ const pullquotes = {
         const range = sel.getRangeAt(0);
         const rect = range.getBoundingClientRect();
 
-        // Don't show if selection is inside the share bar or nav
         const parent = range.commonAncestorContainer.parentElement;
         if (parent && (parent.closest('.tp-share-floating') || parent.closest('nav') || parent.closest('header'))) return;
 
@@ -144,7 +115,6 @@ const pullquotes = {
             });
         });
 
-        // Close on click outside
         document.addEventListener('mousedown', function close(e) {
             if (!popup.contains(e.target)) {
                 popup.remove();
@@ -163,7 +133,6 @@ const infiniteScroll = {
 
         btn.addEventListener('click', () => this.load(btn, container));
 
-        // Auto-load on scroll (optional)
         if (container.dataset.autoLoad === 'true') {
             const sentinel = document.createElement('div');
             sentinel.className = 'tp-scroll-sentinel';
@@ -215,7 +184,6 @@ const backToTop = {
 
 /* ─── Initialize all ─── */
 document.addEventListener('DOMContentLoaded', () => {
-    dm.init();
     progress.init();
     share.init();
     toc.init();

@@ -30,9 +30,6 @@ class Portal_Phase7 {
         // Author social meta boxes
         add_action( 'add_meta_boxes', array( $this, 'add_author_meta_boxes' ) );
         add_action( 'save_post', array( $this, 'save_author_meta' ) );
-
-        // Admin dark mode toggle
-        add_action( 'admin_bar_menu', array( $this, 'admin_dark_toggle' ), 999 );
     }
 
     /* ─── Enqueue Assets ─── */
@@ -171,15 +168,4 @@ class Portal_Phase7 {
         }
     }
 
-    /* ─── Admin Dark Mode Toggle ─── */
-    public function admin_dark_toggle( $wp_admin_bar ) {
-        $wp_admin_bar->add_node( array(
-            'id'    => 'tp-dark-mode',
-            'title' => '🌙 Dark Mode',
-            'href'  => '#',
-            'meta'  => array(
-                'onclick' => 'document.documentElement.classList.toggle("admin-dark");return false;',
-            ),
-        ) );
-    }
 }
