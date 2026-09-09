@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'PORTAL_CORE_VERSION', '1.0.0' );
+define( 'PORTAL_CORE_VERSION', '1.1.0' );
 define( 'PORTAL_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PORTAL_CORE_URL', plugin_dir_url( __FILE__ ) );
 
