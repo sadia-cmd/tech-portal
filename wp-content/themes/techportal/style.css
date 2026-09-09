@@ -19,17 +19,6 @@ Tech Portal — A premium editorial theme for technology news and startup media.
 /* ==========================================================================
    CSS DESIGN TOKENS
    ========================================================================== */
-/* Dark mode removed — force light mode if .dark class persists from cache */
-.dark { background: #fff !important; color: #101114 !important; }
-.dark body { background: #fff !important; color: #101114 !important; }
-.dark .tp-card { background: #fff !important; }
-.dark .tp-header { background: #fff !important; }
-.dark .tp-footer { background: #F7F7F8 !important; }
-.dark h1, .dark h2, .dark h3, .dark h4 { color: #101114 !important; }
-.dark p, .dark span, .dark li, .dark td { color: inherit !important; }
-.dark a { color: #0881BE !important; }
-.dark .tp-nav__link { color: #101114 !important; }
-.dark input, .dark textarea, .dark select { background: #fff !important; color: #101114 !important; border-color: #E3E5E8 !important; }
 :root {
   /* ---- Brand Colors ---- */
   --tp-purple: #37215F;
