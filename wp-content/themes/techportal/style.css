@@ -2830,3 +2830,38 @@ p {
   vertical-align: -3px;
   margin-right: 6px;
 }
+
+/* ==========================================================================
+   DARK MODE OVERRIDES (hardcoded — loaded last, highest priority)
+   ========================================================================== */
+.dark body { background: #0f1117 !important; color: #e4e6eb !important; }
+.dark .tp-header { background: #0f1117 !important; }
+.dark .tp-header__masthead { background: #0f1117 !important; }
+.dark .tp-header__utility { background: #0a0b0f !important; color: #b0b3b8 !important; }
+.dark .tp-nav { border-color: #2d3140 !important; background: #0f1117 !important; }
+.dark .tp-nav__link { color: #e4e6eb !important; }
+.dark .tp-card { background: #1a1d2b !important; border-color: #2d3140 !important; }
+.dark .tp-card:hover { background: #22263a !important; }
+.dark .tp-card__title, .dark .tp-card__title a { color: #e4e6eb !important; }
+.dark .tp-card__excerpt { color: #b0b3b8 !important; }
+.dark .tp-card__meta { color: #8a8d91 !important; }
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5 { color: #e4e6eb !important; }
+.dark a { color: #0881BE !important; }
+.dark .tp-hero__sidebar-title { color: #e4e6eb !important; border-color: #2d3140 !important; }
+.dark .tp-hero__sidebar-title-link { color: #e4e6eb !important; }
+.dark .tp-hero__sidebar-meta { color: #8a8d91 !important; }
+.dark .tp-trending-item { border-color: #2d3140 !important; }
+.dark .tp-trending-number { color: #3a3f50 !important; }
+.dark .tp-trending-title { color: #e4e6eb !important; }
+.dark .tp-btn--outline { border-color: #2d3140 !important; color: #e4e6eb !important; }
+.dark input, .dark textarea, .dark select { background: #1e2130 !important; color: #e4e6eb !important; border-color: #2d3140 !important; }
+.dark .tp-footer, .dark footer { background: #161922 !important; }
+.dark .tp-footer h4, .dark footer h4 { color: #e4e6eb !important; }
+.dark .tp-footer a, .dark footer a { color: #b0b3b8 !important; }
+.dark .tp-toc { background: #161922 !important; border-color: #2d3140 !important; }
+.dark .tp-author-box { background: #161922 !important; border-color: #2d3140 !important; }
+.dark .tp-newsletter-cta { background: #1a1040 !important; }
+.dark .tp-ticker { background: #0a0b0f !important; }
+.dark .tp-section-header__title { color: #e4e6eb !important; }
+.dark .tp-category-label { color: #0881BE !important; }
+.dark .tp-cookie-banner { background: #161922 !important; color: #e4e6eb !important; border-color: #2d3140 !important; }

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'TECHPORTAL_VERSION', '2.3.0' );
+define( 'TECHPORTAL_VERSION', '2.4.0' );
 define( 'TECHPORTAL_DIR', get_template_directory() );
 define( 'TECHPORTAL_URI', get_template_directory_uri() );
 
