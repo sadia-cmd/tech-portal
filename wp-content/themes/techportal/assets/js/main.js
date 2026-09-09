@@ -6,6 +6,10 @@
  */
 
 (function () {
+  /* ---- Clear stale dark mode from localStorage ---- */
+  try { localStorage.removeItem('tp_dark_mode'); } catch(e) {}
+  document.documentElement.classList.remove('dark');
+  document.body.classList.remove('dark');
   'use strict';
 
   /* ---- Mobile Navigation Overlay ---- */
