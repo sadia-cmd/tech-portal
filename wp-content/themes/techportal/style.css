@@ -297,6 +297,10 @@ p {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.tp-grid--startups .tp-card--startup {
+  grid-column: auto;
+}
+
 @media (max-width: 1024px) {
   .tp-grid--startups {
     grid-template-columns: repeat(2, 1fr);
