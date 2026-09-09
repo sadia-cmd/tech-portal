@@ -211,4 +211,42 @@
       });
     }
   }
+
+  /* ---- Dark Mode Toggle ---- */
+  var DARK_MODE_KEY = 'tp_dark_mode';
+  var darkToggle = document.querySelector('.tp-dark-toggle');
+  var htmlEl = document.documentElement;
+
+  // Apply stored preference on load
+  try {
+    var storedTheme = localStorage.getItem(DARK_MODE_KEY);
+    if (storedTheme === 'dark') {
+      document.body.classList.add('dark');
+      htmlEl.classList.add('dark');
+      if (darkToggle) {
+        var moon = darkToggle.querySelector('.tp-moon');
+        var sun = darkToggle.querySelector('.tp-sun');
+        if (moon) moon.style.display = 'none';
+        if (sun) sun.style.display = '';
+      }
+    }
+  } catch (e) {
+    // localStorage unavailable
+  }
+
+  if (darkToggle) {
+    darkToggle.addEventListener('click', function () {
+      var isDark = document.body.classList.toggle('dark');
+      htmlEl.classList.toggle('dark', isDark);
+      var moon = darkToggle.querySelector('.tp-moon');
+      var sun = darkToggle.querySelector('.tp-sun');
+      if (moon) moon.style.display = isDark ? 'none' : '';
+      if (sun) sun.style.display = isDark ? '' : 'none';
+      try {
+        localStorage.setItem(DARK_MODE_KEY, isDark ? 'dark' : 'light');
+      } catch (e) {
+        // localStorage unavailable
+      }
+    });
+  }
 })();

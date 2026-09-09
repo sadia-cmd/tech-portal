@@ -44,7 +44,7 @@ Tech Portal — A premium editorial theme for technology news and startup media.
   --tp-brand: var(--tp-purple);
 
   /* ---- Typography ---- */
-  --tp-font-primary: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --tp-font-primary: 'Inter', 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --tp-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Font Sizes (fluid scale) */
@@ -138,6 +138,17 @@ Tech Portal — A premium editorial theme for technology news and startup media.
 /* ==========================================================================
    CSS RESET & BASE
    ========================================================================== */
+
+/* Local Inter fallback — if the system has Inter installed, use it immediately
+   to avoid FOUT while Google Fonts loads */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: local('Inter'), local('Inter-Regular');
+}
+
 *,
 *::before,
 *::after {
@@ -270,6 +281,34 @@ p {
   .tp-col-sm-4 { grid-column: span 4; }
 }
 
+/* News grid — horizontal cards stacked vertically */
+.tp-grid--news {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tp-space-4);
+}
+
+.tp-grid--news .tp-card--horizontal {
+  grid-column: auto;
+}
+
+/* Startup grid — 3 columns desktop, 2 tablet, 1 mobile */
+.tp-grid--startups {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 1024px) {
+  .tp-grid--startups {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .tp-grid--startups {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ==========================================================================
    COMPONENT: Category Labels
    ========================================================================== */
@@ -333,7 +372,12 @@ p {
   background: var(--tp-white);
   border-radius: var(--tp-radius-md);
   overflow: hidden;
+  overflow: clip;
   transition: transform var(--tp-transition-base), box-shadow var(--tp-transition-base);
+}
+
+.tp-card--startup {
+  overflow: visible !important;
 }
 
 .tp-card:hover {
@@ -428,10 +472,9 @@ p {
   grid-column: span 4;
 }
 
-/* Startup Ecosystem Card — span 4 of 12 (desktop 3-up, tablet 2-up, mobile stacked) */
-.tp-card--startup {
-  grid-column: span 4;
-}
+/* Startup Ecosystem Card — desktop 3-up, tablet 2-up, mobile stacked */
+/* grid-column span handled by .tp-grid--startups override */
+
 
 /* Horizontal Story Card */
 .tp-card--horizontal {
@@ -914,9 +957,15 @@ p {
 
 .tp-footer__grid {
   display: grid;
-  grid-template-columns: 2fr repeat(3, 1fr);
+  grid-template-columns: 2fr repeat(4, 1fr);
   gap: var(--tp-space-8);
   margin-bottom: var(--tp-space-8);
+}
+
+@media (max-width: 1024px) {
+  .tp-footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1810,15 +1859,6 @@ p {
 /* ==========================================================================
    PHASE 2: FOOTER ENHANCEMENTS
    ========================================================================== */
-.tp-footer__grid {
-  grid-template-columns: 2fr repeat(4, 1fr);
-}
-
-@media (max-width: 1024px) {
-  .tp-footer__grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
 
 .tp-footer__newsletter-form {
   display: flex;
@@ -1997,12 +2037,6 @@ p {
 /* Better section spacing */
 .tp-home-section {
   padding: var(--tp-space-12) 0;
-}
-
-/* Startup card refinements */
-.tp-card--startup {
-  position: relative;
-  overflow: hidden;
 }
 
 .tp-card--startup .tp-card__image {
@@ -2248,15 +2282,7 @@ p {
   }
 }
 
-/* Ensure footer 5th column wraps properly */
-@media (max-width: 900px) and (min-width: 769px) {
-  .tp-footer__grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-  .tp-footer__grid > div:first-child {
-    grid-column: span 3;
-  }
-}
+
 
 /* ==========================================================================
    HOMEPAGE — SPLIT SECTION (AI & Cloud / Cybersecurity two-up)
